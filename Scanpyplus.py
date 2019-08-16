@@ -28,7 +28,7 @@ import bbknn
 import os
 from scipy import sparse
 
-def Bertie(adata):
+def Bertie(adata,Resln=1,batch_key='batch'):
     scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
     def bh(pvalues):
         '''
@@ -55,8 +55,8 @@ def Bertie(adata):
             new_pvalues[index] = new_values[i]
         return new_pvalues
 
-    for i in np.unique(adata.obs['sample']):
-        adata_sample = adata[adata.obs['sample']==i,:]
+    for i in np.unique(adata.obs[batch_key]):
+        adata_sample = adata[adata.obs[batch_key]==i,:]
         scrub = scr.Scrublet(adata_sample.X)
         doublet_scores, predicted_doublets = scrub.scrub_doublets(verbose=False)
         adata_sample.obs['scrublet_score'] = doublet_scores
@@ -74,7 +74,7 @@ def Bertie(adata):
         #eoverclustering proper - do basic clustering first, then cluster each cluster
         sc.tl.louvain(adata_sample)
         for clus in np.unique(adata_sample.obs['louvain']):
-            sc.tl.louvain(adata_sample, restrict_to=('louvain',[clus]))
+            sc.tl.louvain(adata_sample, restrict_to=('louvain',[clus]),resolution=Resln)
             adata_sample.obs['louvain'] = adata_sample.obs['louvain_R']
         #compute the cluster scores - the median of Scrublet scores per overclustered cluster
         for clus in np.unique(adata_sample.obs['louvain']):
@@ -96,6 +96,6 @@ def Bertie(adata):
 
         scrub.plot_histogram();
         #plt.savefig('limb/sample_'+i+'_doulet_histogram.pdf')
-        adata.obs.loc[adata.obs['sample']==i,'doublet_scores']=doublet_scores
-        adata.obs.loc[adata.obs['sample']==i,'bh_pval'] = bh(pvals)
+        adata.obs.loc[adata.obs[batch_key]==i,'doublet_scores']=doublet_scores
+        adata.obs.loc[adata.obs[batch_key]==i,'bh_pval'] = bh(pvals)
     return adata
