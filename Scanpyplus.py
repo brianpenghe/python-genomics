@@ -8,7 +8,6 @@ import seaborn as sns
 import numpy as np
 import random
 import sys
-import jp_single_raw as jp
 from sklearn.manifold import TSNE
 from sklearn.preprocessing import scale
 from sklearn.decomposition import TruncatedSVD
