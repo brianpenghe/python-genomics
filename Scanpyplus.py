@@ -100,7 +100,7 @@ def Bertie(adata,Resln=1,batch_key='batch'):
     return adata
 
 
-def snsCluster(MouseC1data,cell_type,cellnames,genenames,MouseC1ColorDict):
+def snsCluster(MouseC1data,cell_type,cellnames,genenames,MouseC1ColorDict,figsize=(10,7)):
     MouseC1data_df = MouseC1data[MouseC1data.obs_names,:].to_df()
     MouseC1data_df['louvain'] = MouseC1data[MouseC1data.obs_names,:].obs[cell_type]
     MouseC1data_df = MouseC1data_df.sort_values(by='louvain')
@@ -110,5 +110,7 @@ def snsCluster(MouseC1data,cell_type,cellnames,genenames,MouseC1ColorDict):
     louvain_col_colors=cluster_names.map(MouseC1ColorDict)
     adata_for_plotting = MouseC1data_df.loc[cellnames,MouseC1data_df.columns.isin(genenames)]
     adata_for_plotting = adata_for_plotting.reindex(columns=genenames)
-    cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric="correlation",cmap='RdYlBu_r',row_cluster=False,col_cluster=False,robust=True,xticklabels=False,figsize=(10,7),z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors)
+    cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric="correlation",cmap='RdYlBu_r',\
+                 figsize=figsize,row_cluster=False,col_cluster=False,robust=True,xticklabels=False,\
+                 z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors)
     return cg1_0point2
