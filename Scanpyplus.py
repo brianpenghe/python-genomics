@@ -114,3 +114,33 @@ def snsCluster(MouseC1data,cell_type,cellnames,genenames,MouseC1ColorDict,figsiz
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
                  z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors)
     return cg1_0point2
+
+from datetime import date
+def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidate = False):
+    #This function doesn't do normalization or scaling
+    #The logistic regression function function returns the updated Query object with predicted info stored
+    IntersectGenes = np.intersect1d(Reference.var_names,Query.var_names)
+    Reference2 = Reference[:,IntersectGenes]
+    Query2 = Query[:,IntersectGenes]
+    X = Reference2.X
+    y = Reference2.obs[Category]
+    x = Query2.X
+    cv = StratifiedKFold(n_splits=5, random_state=None, shuffle=False)
+    logit = LogisticRegression(penalty='l2',
+                           random_state=42,
+                           C=0.2,
+                           solver='sag',
+                           multi_class='multinomial',
+                           max_iter=200,
+                           verbose=10
+                          )
+    result=logit.fit(X, y)
+    y_predict=result.predict(x)
+    today = date.today()
+    if DoValidate is True:
+        scores = cross_val_score(logit, X, y, cv=cv)
+
+    _ = joblib.dump(result,str(today)+'Sklearn.result.joblib.pkl',compress=9)
+
+    query.obs['Predicted'] = pd.DataFrame({'Predicted':y_predict})
+    return Query
