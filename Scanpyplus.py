@@ -142,5 +142,5 @@ def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidat
 
     _ = joblib.dump(result,str(today)+'Sklearn.result.joblib.pkl',compress=9)
 
-    query.obs['Predicted'] = pd.DataFrame({'Predicted':y_predict})
+    Query.obs['Predicted'] = pd.DataFrame({'Predicted':y_predict})
     return Query
