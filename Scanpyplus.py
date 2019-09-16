@@ -100,7 +100,12 @@ def Bertie(adata,Resln=1,batch_key='batch'):
     return adata
 
 
-def snsCluster(MouseC1data,cell_type,cellnames,genenames,MouseC1ColorDict,figsize=(10,7),row_cluster=False,col_cluster=False,robust=True,xticklabels=False):
+def snsCluster(MouseC1data,MouseC1ColorDict,cell_type='louvain',cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,robust=True,xticklabels=False):
+    if 'default' in cellnames:
+        cellnames = MouseC1data.obs_names
+    if 'default' in genenames:
+        genenames = MouseC1data.var_names
+
     MouseC1data_df = MouseC1data[MouseC1data.obs_names,:].to_df()
     MouseC1data_df['louvain'] = MouseC1data[MouseC1data.obs_names,:].obs[cell_type]
     MouseC1data_df = MouseC1data_df.sort_values(by='louvain')
@@ -142,5 +147,5 @@ def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidat
 
     _ = joblib.dump(result,str(today)+'Sklearn.result.joblib.pkl',compress=9)
 
-    Query.obs['Predicted'] = pd.DataFrame({'Predicted':y_predict})
+    Query.obs['Predicted'] = y_predict
     return Query
