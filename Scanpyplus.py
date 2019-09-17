@@ -26,6 +26,7 @@ import anndata
 import bbknn
 import os
 from scipy import sparse
+from scipy import cluster
 
 def Bertie(adata,Resln=1,batch_key='batch'):
     scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
@@ -100,7 +101,9 @@ def Bertie(adata,Resln=1,batch_key='batch'):
     return adata
 
 
-def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,robust=True,xticklabels=False,method='complete',metric='correlation'):
+def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
+            cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
+            robust=True,xticklabels=False,method='complete',metric='correlation'):
     if 'default' in cellnames:
         cellnames = MouseC1data.obs_names
     if 'default' in genenames:
@@ -128,10 +131,34 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
 
     return cg1_0point2
 
+def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
+            cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
+            method='complete',metric='correlation',Cutoff=0.8,CladeSize=2):
+    test=snsCluster(adata,MouseC1ColorDict=MouseC1ColorDict,\
+                           MouseC1ColorDict2=MouseC1ColorDict2,\
+                           genenames=genenames, gene_type=gene_type,\
+                           figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster)
+    cutree = cluster.hierarchy.cut_tree(test.dendrogram_row.linkage,height=Cutoff)
+    TreeDict=dict(zip(*np.unique(cutree, return_counts=True)))
+    TreeDF=pd.DataFrame(TreeDict,index=[0])
+    DeepIndex=[i in TreeDF.loc[:,TreeDF.iloc[0,:] > CladeSize].columns.values for i in cutree]
+    bdata=adata[:,genenames]
+    bdata.var['Deep']=DeepIndex
+    test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
+                           MouseC1ColorDict2=MouseC1ColorDict2,\
+                           gene_type='Deep',\
+                           figsize=figsize,row_cluster=True,col_cluster=True)
+    test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
+                           MouseC1ColorDict2=MouseC1ColorDict2,\
+                           gene_type='null',\
+                           genenames=genenames[np.array(DeepIndex)],\
+                           figsize=figsize,row_cluster=True,col_cluster=True)
+    return bdata
+
 from datetime import date
 def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidate = False):
     #This function doesn't do normalization or scaling
-    #The logistic regression function function returns the updated Query object with predicted info stored
+    #The logistic regression function returns the updated Query object with predicted info stored
     IntersectGenes = np.intersect1d(Reference.var_names,Query.var_names)
     Reference2 = Reference[:,IntersectGenes]
     Query2 = Query[:,IntersectGenes]
