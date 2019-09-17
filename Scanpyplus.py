@@ -100,7 +100,7 @@ def Bertie(adata,Resln=1,batch_key='batch'):
     return adata
 
 
-def snsCluster(MouseC1data,MouseC1ColorDict,cell_type='louvain',cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,robust=True,xticklabels=False):
+def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,robust=True,xticklabels=False,method='complete',metric='correlation'):
     if 'default' in cellnames:
         cellnames = MouseC1data.obs_names
     if 'default' in genenames:
@@ -115,9 +115,17 @@ def snsCluster(MouseC1data,MouseC1ColorDict,cell_type='louvain',cellnames=['defa
     louvain_col_colors=cluster_names.map(MouseC1ColorDict)
     adata_for_plotting = MouseC1data_df.loc[cellnames,MouseC1data_df.columns.isin(genenames)]
     adata_for_plotting = adata_for_plotting.reindex(columns=genenames)
-    cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric="correlation",cmap='RdYlBu_r',\
+    if gene_type == 'null':
+        cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric="correlation",cmap='RdYlBu_r',\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
                  z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors)
+    else:
+        genegroup_names=MouseC1data[:,MouseC1data.var_names].var[gene_type]
+        celltype_row_colors=genegroup_names.map(MouseC1ColorDict2)
+        cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric="correlation",cmap='RdYlBu_r',\
+                 figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
+                 z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,row_colors=celltype_row_colors)
+
     return cg1_0point2
 
 from datetime import date
