@@ -121,13 +121,13 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
     if gene_type == 'null':
         cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric="correlation",cmap='RdYlBu_r',\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
-                 z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors)
+                 z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,method=method)
     else:
         genegroup_names=MouseC1data[:,MouseC1data.var_names].var[gene_type]
         celltype_row_colors=genegroup_names.map(MouseC1ColorDict2)
         cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric="correlation",cmap='RdYlBu_r',\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
-                 z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,row_colors=celltype_row_colors)
+                 z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,row_colors=celltype_row_colors,method=method)
 
     return cg1_0point2
 
@@ -136,7 +136,7 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
             method='complete',metric='correlation',Cutoff=0.8,CladeSize=2):
     test=snsCluster(adata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
-                           genenames=genenames, gene_type=gene_type,\
+                           genenames=genenames, gene_type=gene_type,method=method,\
                            figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster)
     cutree = cluster.hierarchy.cut_tree(test.dendrogram_row.linkage,height=Cutoff)
     TreeDict=dict(zip(*np.unique(cutree, return_counts=True)))
@@ -146,11 +146,11 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
     bdata.var['Deep']=DeepIndex
     test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
-                           gene_type='Deep',\
+                           gene_type='Deep',method=method,\
                            figsize=figsize,row_cluster=True,col_cluster=True)
     test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
-                           gene_type='null',\
+                           gene_type='null',method=method,\
                            genenames=genenames[np.array(DeepIndex)],\
                            figsize=figsize,row_cluster=True,col_cluster=True)
     return bdata
