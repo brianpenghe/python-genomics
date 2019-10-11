@@ -137,7 +137,8 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
             method='complete',metric='correlation',Cutoff=0.8,CladeSize=2):
     test=snsCluster(adata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
-                           genenames=genenames, gene_type=gene_type,method=method,\
+                           genenames=genenames, cellnames=cellnames,\
+                           gene_type=gene_type, cell_type=cell_type,method=method,\
                            figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster)
     cutree = cluster.hierarchy.cut_tree(test.dendrogram_row.linkage,height=Cutoff)
     TreeDict=dict(zip(*np.unique(cutree, return_counts=True)))
@@ -147,11 +148,11 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
     bdata.var['Deep']=DeepIndex
     test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
-                           gene_type='Deep',method=method,\
+                           cellnames=cellnames,gene_type='Deep',cell_type=cell_type,method=method,\
                            figsize=figsize,row_cluster=True,col_cluster=True)
     test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
-                           gene_type='null',method=method,\
+                           cellnames=cellnames,gene_type='null',cell_type=cell_type,method=method,\
                            genenames=genenames[np.array(DeepIndex)],\
                            figsize=figsize,row_cluster=True,col_cluster=True)
     return bdata
