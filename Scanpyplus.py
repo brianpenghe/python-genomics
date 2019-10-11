@@ -30,6 +30,7 @@ from scipy import cluster
 
 def Bertie(adata,Resln=1,batch_key='batch'):
     scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
+    adata.obs['doublet_scores']=0
     def bh(pvalues):
         '''
         Computes the Benjamini-Hochberg FDR correction.
@@ -154,6 +155,23 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
                            genenames=genenames[np.array(DeepIndex)],\
                            figsize=figsize,row_cluster=True,col_cluster=True)
     return bdata
+
+def DeepTree2(adata,method='complete',metric='correlation',cellnames=['default'],genenames=['default'],\
+               Cutoff=0.8,CladeSize=2):
+    if 'default' in cellnames:
+        cellnames = adata.obs_names
+    if 'default' in genenames:
+        genenames = adata.var_names
+    adata_df=adata[cellnames,:][:,genenames].to_df()
+    testscipy=scipy.cluster.hierarchy.fclusterdata(adata_df.transpose(),\
+                    metric=metric,method=method,t=Cutoff,criterion="distance")
+    TreeDict=dict(zip(*np.unique(testscipy, return_counts=True)))
+    TreeDF=pd.DataFrame(TreeDict,index=[0])
+    DeepIndex=[i in TreeDF.loc[:,TreeDF.iloc[0,:] > CladeSize].columns.values for i in testscipy]
+    bdata=adata[cellnames,:][:,genenames]
+    bdata.var['Deep']=DeepIndex
+    return bdata
+
 
 from datetime import date
 def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidate = False):
