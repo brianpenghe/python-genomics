@@ -132,6 +132,15 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
 
     return cg1_0point2
 
+def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain'):
+    if 'default' in genenames:
+        genenames = MouseC1data.var_names
+    MouseC1data_df = MouseC1data[:,genenames].to_df()
+    MouseC1data_df['louvain'] = MouseC1data[MouseC1data.obs_names,:][:,genenames].obs[cell_type]
+    MouseC1data_df = MouseC1data_df.sort_values(by='louvain')
+    MousePseudoBulk = MouseC1data_df.groupby(by='louvain').mean()
+    return MousePseudoBulk
+
 def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
             method='complete',metric='correlation',Cutoff=0.8,CladeSize=2):
