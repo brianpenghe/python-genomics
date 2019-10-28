@@ -135,10 +135,13 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
 def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain'):
     if 'default' in genenames:
         genenames = MouseC1data.var_names
-    MouseC1data_df = MouseC1data[:,genenames].to_df()
-    MouseC1data_df['louvain'] = MouseC1data[MouseC1data.obs_names,:][:,genenames].obs[cell_type]
-    MouseC1data_df = MouseC1data_df.sort_values(by='louvain')
-    MousePseudoBulk = MouseC1data_df.groupby(by='louvain').mean()
+    MousePseudoBulk = pd.DataFrame(columns=np.unique(MouseC1data.obs[cell_type]),\
+                        index=genenames)
+    for key in np.unique(MouseC1data.obs[cell_type]):
+        temp=MouseC1data[MouseC1data.obs[cell_type]==key,:].to_df()
+        temp[cell_type]=key
+        temp2 = temp.groupby(by=cell_type).mean()
+        MousePseudoBulk.loc[:,key]=temp2.loc[key,:].transpose()
     return MousePseudoBulk
 
 def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
