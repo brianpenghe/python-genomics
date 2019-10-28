@@ -141,7 +141,9 @@ def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain'):
         temp=MouseC1data[MouseC1data.obs[cell_type]==key,:].to_df()
         temp[cell_type]=key
         temp2 = temp.groupby(by=cell_type).mean()
+        del temp
         MousePseudoBulk.loc[:,key]=temp2.loc[key,:].transpose()
+        del temp2
     return MousePseudoBulk
 
 def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
