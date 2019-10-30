@@ -132,12 +132,16 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
 
     return cg1_0point2
 
-def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain'):
+def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=float):
     if 'default' in genenames:
         genenames = MouseC1data.var_names
     MousePseudoBulk = pd.DataFrame(columns=(MouseC1data.obs[cell_type]).unique(),\
                         index=genenames)
-    for key in MouseC1data.obs[cell_type].unique():
+    Main_cell_types = MouseC1data.obs[cell_type].unique()
+    Main_cell_types = np.delete(Main_cell_types,\
+            [ i for i in range(len(Main_cell_types)) if isinstance(Main_cell_types[i], float) ])
+    print(Main_cell_types)
+    for key in Main_cell_types:
         temp=MouseC1data[MouseC1data.obs[cell_type]==key,:].to_df()
         temp[cell_type]=key
         temp2 = temp.groupby(by=cell_type).mean()
