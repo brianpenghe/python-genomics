@@ -34,6 +34,21 @@ def ExtractColor(adata,obsKey='louvain',keytype=int):
     colors=list(adata.uns[obsKey+'_colors'])
     return dict(zip(labels,colors))
 
+def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',\
+    celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str):
+    if 'default' in celltypelist:
+        celltypelist = sorted(adata.obs[celltypekey].unique().to_list(),key=celltypekeytype)
+    if 'default' in stagelist:
+        stagelist = sorted(adata.obs[stagekey].unique().to_list(),key=stagekeytype)
+    colors=list(adata.uns[celltypekey+'_colors'])
+    count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]))
+    count_ratio_array=count_array / np.sum(count_array,axis=0)
+    for i in range(len(celltypelist)):
+        plt.barh(stagelist[::-1],count_ratio_array[i,::-1],
+            left=np.sum(count_ratio_array[0:i,::-1],axis=0),color=colors[i],label=stagelist[i])
+    plt.grid(b=False)
+
+
 def mtx2df(mtx,idx,col):
     #mtx is the name/location of the matrix.mtx file
     #idx is the index file (rownames)
