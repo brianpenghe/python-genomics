@@ -48,6 +48,22 @@ def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',\
             left=np.sum(count_ratio_array[0:i,::-1],axis=0),color=colors[i],label=stagelist[i])
     plt.grid(b=False)
 
+def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',\
+    #please remember to run pl.umap to assign colors
+    celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str):
+    if 'default' in celltypelist:
+        celltypelist = sorted(adata.obs[celltypekey].unique().to_list(),key=celltypekeytype)
+    if 'default' in stagelist:
+        stagelist = sorted(adata.obs[stagekey].unique().to_list(),key=stagekeytype)
+    colors=list(adata.uns[stagekey+'_colors'])
+    count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]))
+    count_ratio_array=count_array.transpose() / np.sum(count_array,axis=1)
+    for i in range(len(stagelist)):
+        plt.bar(celltypelist,count_ratio_array[i,:],
+            bottom=1-np.sum(count_ratio_array[0:i+1,:],axis=0),
+           color=colors[i],label=stagelist[i])
+    plt.grid(b=False)
+    plt.legend(stagelist)
 
 def mtx2df(mtx,idx,col):
     #mtx is the name/location of the matrix.mtx file
