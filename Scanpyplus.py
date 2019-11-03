@@ -27,6 +27,19 @@ import bbknn
 import os
 from scipy import sparse
 from scipy import cluster
+from glob import iglob
+
+def mtx2df(mtx,idx,col):
+    #mtx is the name/location of the matrix.mtx file
+    #idx is the index file (rownames)
+    #col is the colnames file
+    count = scipy.io.mmread(mtx)
+    idxs = [i.strip() for i in open(idx)]
+    cols = [i.strip() for i in open(col)]
+    sc_count = pd.DataFrame(data=count.toarray(),
+                        index=idxs,
+                        columns=cols)
+    return sc_count 
 
 def Bertie(adata,Resln=1,batch_key='batch'):
     scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
@@ -138,7 +151,7 @@ def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=f
     Main_cell_types = MouseC1data.obs[cell_type].unique()
     Main_cell_types = np.delete(Main_cell_types,\
             [ i for i in range(len(Main_cell_types)) if isinstance(Main_cell_types[i], float) ])
-    MousePseudoBulk = pd.DataFrame(columns=(Main_cell_types,index=genenames)
+    MousePseudoBulk = pd.DataFrame(columns=Main_cell_types,index=genenames)
     print(Main_cell_types)
     for key in Main_cell_types:
         temp=MouseC1data[MouseC1data.obs[cell_type]==key,:].to_df()
