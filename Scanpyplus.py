@@ -158,7 +158,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
         cellnames = MouseC1data.obs_names
     if 'default' in genenames:
         genenames = MouseC1data.var_names
-
+    genenames = np.intersect1d(np.array(genenames),np.array(genenames))
     MouseC1data_df = MouseC1data[MouseC1data.obs_names,:].to_df()
     MouseC1data_df['louvain'] = MouseC1data[MouseC1data.obs_names,:].obs[cell_type]
     MouseC1data_df = MouseC1data_df.sort_values(by='louvain')
