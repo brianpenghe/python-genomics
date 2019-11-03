@@ -29,6 +29,11 @@ from scipy import sparse
 from scipy import cluster
 from glob import iglob
 
+def ExtractColor(adata,obsKey='louvain',keytype=int):
+    labels=sorted(adata.obs[obsKey].unique().to_list(),key=keytype)
+    colors=list(adata.uns[obsKey+'_colors'])
+    return dict(zip(labels,colors))
+
 def mtx2df(mtx,idx,col):
     #mtx is the name/location of the matrix.mtx file
     #idx is the index file (rownames)
