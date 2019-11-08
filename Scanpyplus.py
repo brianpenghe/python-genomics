@@ -201,6 +201,10 @@ def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=f
 def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
             method='complete',metric='correlation',Cutoff=0.8,CladeSize=2):
+    if 'default' in cellnames:
+        cellnames = adata.obs_names
+    if 'default' in genenames:
+        genenames = adata.var_names    
     test=snsCluster(adata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            genenames=genenames, cellnames=cellnames,\
