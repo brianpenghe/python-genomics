@@ -45,7 +45,7 @@ def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',\
     count_ratio_array=count_array / np.sum(count_array,axis=0)
     for i in range(len(celltypelist)):
         plt.barh(stagelist[::-1],count_ratio_array[i,::-1],
-            left=np.sum(count_ratio_array[0:i,::-1],axis=0),color=colors[i],label=stagelist[i])
+            left=np.sum(count_ratio_array[0:i,::-1],axis=0),color=colors[i],label=celltypelist[i])
     plt.grid(b=False)
 
 def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',\
