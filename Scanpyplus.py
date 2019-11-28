@@ -37,9 +37,9 @@ def ExtractColor(adata,obsKey='louvain',keytype=int):
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str):
     if 'default' in celltypelist:
-        celltypelist = sorted(adata.obs[celltypekey].unique().to_list(),key=celltypekeytype)
+        celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
     if 'default' in stagelist:
-        stagelist = sorted(adata.obs[stagekey].unique().to_list(),key=stagekeytype)
+        stagelist = sorted(adata.obs[stagekey].unique().tolist(),key=stagekeytype)
     colors=list(adata.uns[celltypekey+'_colors'])
     count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]))
     count_ratio_array=count_array / np.sum(count_array,axis=0)
@@ -52,9 +52,9 @@ def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',\
     #please remember to run pl.umap to assign colors
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str):
     if 'default' in celltypelist:
-        celltypelist = sorted(adata.obs[celltypekey].unique().to_list(),key=celltypekeytype)
+        celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
     if 'default' in stagelist:
-        stagelist = sorted(adata.obs[stagekey].unique().to_list(),key=stagekeytype)
+        stagelist = sorted(adata.obs[stagekey].unique().tolist(),key=stagekeytype)
     colors=list(adata.uns[stagekey+'_colors'])
     count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]))
     count_ratio_array=count_array.transpose() / np.sum(count_array,axis=1)
