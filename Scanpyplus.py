@@ -34,7 +34,7 @@ def ExtractColor(adata,obsKey='louvain',keytype=int):
     colors=list(adata.uns[obsKey+'_colors'])
     return dict(zip(labels,colors))
 
-def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',\
+def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str):
     if 'default' in celltypelist:
         celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
@@ -47,6 +47,8 @@ def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',\
         plt.barh(stagelist[::-1],count_ratio_array[i,::-1],
             left=np.sum(count_ratio_array[0:i,::-1],axis=0),color=colors[i],label=celltypelist[i])
     plt.grid(b=False)
+    if plotlabel:
+        plt.legend(celltypelist)
 
 def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',\
     #please remember to run pl.umap to assign colors
