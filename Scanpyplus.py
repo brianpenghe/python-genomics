@@ -188,7 +188,7 @@ def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=f
         genenames = MouseC1data.var_names
     Main_cell_types = MouseC1data.obs[cell_type].unique()
     Main_cell_types = np.delete(Main_cell_types,\
-            [ i for i in range(len(Main_cell_types)) if isinstance(Main_cell_types[i], float) ])
+            [ i for i in range(len(Main_cell_types)) if isinstance(Main_cell_types[i], filterout) ])
     MousePseudoBulk = pd.DataFrame(columns=Main_cell_types,index=genenames)
     print(Main_cell_types)
     for key in Main_cell_types:
