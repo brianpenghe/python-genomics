@@ -167,7 +167,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
 
     MouseC1data_df3 = MouseC1data_df.loc[pd.Series(cellnames,index=cellnames).index,:]
     cluster_names=MouseC1data_df3.pop('louvain')
-    louvain_col_colors=cluster_names.map(MouseC1ColorDict)
+    louvain_col_colors=cluster_names.map(MouseC1ColorDict).astype(str)
     adata_for_plotting = MouseC1data_df.loc[cellnames,MouseC1data_df.columns.isin(genenames)]
     adata_for_plotting = adata_for_plotting.reindex(columns=genenames)
     if gene_type == 'null':
