@@ -171,13 +171,13 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
     adata_for_plotting = MouseC1data_df.loc[cellnames,MouseC1data_df.columns.isin(genenames)]
     adata_for_plotting = adata_for_plotting.reindex(columns=genenames)
     if gene_type == 'null':
-        cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric="correlation",cmap='RdYlBu_r',\
+        cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap='RdYlBu_r',\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
                  z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,method=method)
     else:
         genegroup_names=MouseC1data[:,MouseC1data.var_names].var[gene_type]
         celltype_row_colors=genegroup_names.map(MouseC1ColorDict2)
-        cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric="correlation",cmap='RdYlBu_r',\
+        cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap='RdYlBu_r',\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
                  z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,row_colors=celltype_row_colors,method=method)
 
@@ -211,7 +211,7 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            genenames=genenames, cellnames=cellnames,\
                            gene_type=gene_type, cell_type=cell_type,method=method,\
-                           figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster)
+                           figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,metric=metric)
     cutree = cluster.hierarchy.cut_tree(test.dendrogram_row.linkage,height=Cutoff)
     TreeDict=dict(zip(*np.unique(cutree, return_counts=True)))
     TreeDF=pd.DataFrame(TreeDict,index=[0])
@@ -221,12 +221,12 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
     test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            cellnames=cellnames,gene_type='Deep',cell_type=cell_type,method=method,\
-                           figsize=figsize,row_cluster=True,col_cluster=True)
+                           figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
     test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            cellnames=cellnames,gene_type='null',cell_type=cell_type,method=method,\
                            genenames=genenames[np.array(DeepIndex)],\
-                           figsize=figsize,row_cluster=True,col_cluster=True)
+                           figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
     return bdata
 
 def DeepTree2(adata,method='complete',metric='correlation',cellnames=['default'],genenames=['default'],\
