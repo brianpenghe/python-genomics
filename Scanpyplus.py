@@ -161,7 +161,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
     if 'default' in genenames:
         genenames = MouseC1data.var_names
     genenames = np.intersect1d(np.array(MouseC1data.var_names),np.array(genenames))
-    MouseC1data_df = MouseC1data[MouseC1data.obs_names,:].to_df()
+    MouseC1data_df = MouseC1data[MouseC1data.obs_names,:][:,genenames].to_df()
     MouseC1data_df['louvain'] = MouseC1data[MouseC1data.obs_names,:].obs[cell_type]
     MouseC1data_df = MouseC1data_df.sort_values(by='louvain')
 
@@ -216,16 +216,15 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
     TreeDict=dict(zip(*np.unique(cutree, return_counts=True)))
     TreeDF=pd.DataFrame(TreeDict,index=[0])
     DeepIndex=[i in TreeDF.loc[:,TreeDF.iloc[0,:] > CladeSize].columns.values for i in cutree]
-    bdata=adata[:,genenames]
+    bdata=adata[:,test.data.index]
     bdata.var['Deep']=DeepIndex
     test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            cellnames=cellnames,gene_type='Deep',cell_type=cell_type,method=method,\
                            figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
-    test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
+    test=snsCluster(bdata[:,DeepIndex],MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            cellnames=cellnames,gene_type='null',cell_type=cell_type,method=method,\
-                           genenames=genenames[np.array(DeepIndex)],\
                            figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
     return bdata
 
