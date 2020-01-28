@@ -175,7 +175,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
                  z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,method=method)
     else:
-        genegroup_names=MouseC1data[:,MouseC1data.var_names].var[gene_type]
+        genegroup_names=MouseC1data[:,genenames].var[gene_type]
         celltype_row_colors=genegroup_names.map(MouseC1ColorDict2)
         cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap='RdYlBu_r',\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
