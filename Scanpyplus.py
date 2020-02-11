@@ -218,15 +218,15 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
     DeepIndex=[i in TreeDF.loc[:,TreeDF.iloc[0,:] > CladeSize].columns.values for i in cutree]
     bdata=adata[:,test.data.index]
     bdata.var['Deep']=DeepIndex
-    test=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
+    test1=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            cellnames=cellnames,gene_type='Deep',cell_type=cell_type,method=method,\
                            figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
-    test=snsCluster(bdata[:,DeepIndex],MouseC1ColorDict=MouseC1ColorDict,\
+    test2=snsCluster(bdata[:,DeepIndex],MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            cellnames=cellnames,gene_type='null',cell_type=cell_type,method=method,\
                            figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
-    return bdata
+    return [bdata,test,test1,test2]
 
 def DeepTree2(adata,method='complete',metric='correlation',cellnames=['default'],genenames=['default'],\
                Cutoff=0.8,CladeSize=2):
