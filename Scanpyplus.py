@@ -153,7 +153,7 @@ def Bertie(adata,Resln=1,batch_key='batch'):
     return adata
 
 
-def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
+def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
             robust=True,xticklabels=False,method='complete',metric='correlation'):
     if 'default' in cellnames:
@@ -208,14 +208,14 @@ def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=f
         del temp2
     return MousePseudoBulk
 
-def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
-            cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
+def DeepTree(adata,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
+            cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=True,col_cluster=True,\
             method='complete',metric='correlation',Cutoff=0.8,CladeSize=2):
     if 'default' in cellnames:
         cellnames = adata.obs_names
     if 'default' in genenames:
         genenames = adata.var_names    
-    test=snsCluster(adata,MouseC1ColorDict=MouseC1ColorDict,\
+    test=snsCluster(adata,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            genenames=genenames, cellnames=cellnames,\
                            gene_type=gene_type, cell_type=cell_type,method=method,\
@@ -226,11 +226,11 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
     DeepIndex=[i in TreeDF.loc[:,TreeDF.iloc[0,:] > CladeSize].columns.values for i in cutree]
     bdata=adata[:,test.data.index][cellnames,:]
     bdata.var['Deep']=DeepIndex
-    test1=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
+    test1=snsCluster(bdata,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            cellnames=cellnames,gene_type='Deep',cell_type=cell_type,method=method,\
                            figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
-    test2=snsCluster(bdata[:,DeepIndex],MouseC1ColorDict=MouseC1ColorDict,\
+    test2=snsCluster(bdata[:,DeepIndex],\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            cellnames=cellnames,gene_type='null',cell_type=cell_type,method=method,\
                            figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
