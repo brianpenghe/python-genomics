@@ -162,11 +162,11 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
         genenames = MouseC1data.var_names
     genenames = np.intersect1d(np.array(MouseC1data.var_names),np.array(genenames))
     MouseC1data_df = MouseC1data[MouseC1data.obs_names,:][:,genenames].to_df()
-    MouseC1data_df['louvain'] = MouseC1data[MouseC1data.obs_names,:].obs[cell_type]
-    MouseC1data_df = MouseC1data_df.sort_values(by='louvain')
+    MouseC1data_df[cell_type] = MouseC1data[MouseC1data.obs_names,:].obs[cell_type]
+    MouseC1data_df = MouseC1data_df.sort_values(by=cell_type)
 
     MouseC1data_df3 = MouseC1data_df.loc[pd.Series(cellnames,index=cellnames).index,:]
-    cluster_names=MouseC1data_df3.pop('louvain')
+    cluster_names=MouseC1data_df3.pop(cell_type)
     louvain_col_colors=cluster_names.map(MouseC1ColorDict).astype(str)
     adata_for_plotting = MouseC1data_df.loc[cellnames,MouseC1data_df.columns.isin(genenames)]
     adata_for_plotting = adata_for_plotting.reindex(columns=genenames)
@@ -216,7 +216,7 @@ def DeepTree(adata,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain',gene_t
     TreeDict=dict(zip(*np.unique(cutree, return_counts=True)))
     TreeDF=pd.DataFrame(TreeDict,index=[0])
     DeepIndex=[i in TreeDF.loc[:,TreeDF.iloc[0,:] > CladeSize].columns.values for i in cutree]
-    bdata=adata[:,test.data.index]
+    bdata=adata[:,test.data.index][cellnames,:]
     bdata.var['Deep']=DeepIndex
     test1=snsCluster(bdata,MouseC1ColorDict=MouseC1ColorDict,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
