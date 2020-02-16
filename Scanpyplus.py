@@ -191,6 +191,14 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
 
     return cg1_0point2
 
+def markSeaborn(snsObj,genes):
+    NewIndex=pd.DataFrame(np.asarray([snsObj.data.index[i] for i in snsObj.dendrogram_row.reordered_ind])).ix[:,0]
+    NewIndex2=NewIndex.isin(genes)
+    snsObj.ax_heatmap.set_yticks(NewIndex[NewIndex2].index.values.tolist())
+    snsObj.ax_heatmap.set_yticklabels(NewIndex[NewIndex2].values.tolist())
+    snsObj.fig
+    return snsObj
+
 def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=float):
     if 'default' in genenames:
         genenames = MouseC1data.var_names
