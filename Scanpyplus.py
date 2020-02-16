@@ -161,13 +161,17 @@ def snsCluster(MouseC1data,MouseC1ColorDict,MouseC1ColorDict2,cell_type='louvain
     if 'default' in genenames:
         genenames = MouseC1data.var_names
     genenames = np.intersect1d(np.array(MouseC1data.var_names),np.array(genenames))
-    MouseC1data_df = MouseC1data[MouseC1data.obs_names,:][:,genenames].to_df()
-    MouseC1data_df[cell_type] = MouseC1data[MouseC1data.obs_names,:].obs[cell_type]
-    MouseC1data_df = MouseC1data_df.sort_values(by=cell_type)
-
-    MouseC1data_df3 = MouseC1data_df.loc[pd.Series(cellnames,index=cellnames).index,:]
-    cluster_names=MouseC1data_df3.pop(cell_type)
-    louvain_col_colors=cluster_names.map(MouseC1ColorDict).astype(str)
+    cell_types=cell_type
+    if type(cell_type) == str:
+        cell_types=[cell_type]
+    louvain_col_colors=[]
+    for key in cell_types: 
+        MouseC1data_df = MouseC1data[MouseC1data.obs_names,:][:,genenames].to_df()
+        MouseC1data_df[key] = MouseC1data[MouseC1data.obs_names,:].obs[key]
+        MouseC1data_df = MouseC1data_df.sort_values(by=key)
+        MouseC1data_df3 = MouseC1data_df.loc[pd.Series(cellnames,index=cellnames).index,:]
+        cluster_names=MouseC1data_df3.pop(key)
+        louvain_col_colors.append(cluster_names.map(ExtractColor(MouseC1data,obsKey=key,keytype=str)).astype(str))
     adata_for_plotting = MouseC1data_df.loc[cellnames,MouseC1data_df.columns.isin(genenames)]
     adata_for_plotting = adata_for_plotting.reindex(columns=genenames)
     if gene_type == 'null':
