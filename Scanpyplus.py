@@ -232,7 +232,7 @@ def DeepTree(adata,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_varia
     TreeDict=dict(zip(*np.unique(cutree, return_counts=True)))
     TreeDF=pd.DataFrame(TreeDict,index=[0])
     DeepIndex=[i in TreeDF.loc[:,TreeDF.iloc[0,:] > CladeSize].columns.values for i in cutree]
-    bdata=adata[:,test.data.index][cellnames,:]
+    bdata=adata[:,test.data.index][cellnames]
     bdata.var['Deep']=DeepIndex
     test1=snsCluster(bdata,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
