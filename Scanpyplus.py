@@ -166,8 +166,8 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
         cell_types=[cell_type]
     louvain_col_colors=[]
     for key in cell_types: 
-        MouseC1data_df = MouseC1data[MouseC1data.obs_names,:][:,genenames].to_df()
-        MouseC1data_df[key] = MouseC1data[MouseC1data.obs_names,:].obs[key]
+        MouseC1data_df = MouseC1data[MouseC1data.obs_names][:,genenames].to_df()
+        MouseC1data_df[key] = MouseC1data[MouseC1data.obs_names].obs[key]
         MouseC1data_df = MouseC1data_df.sort_values(by=key)
         MouseC1data_df3 = MouseC1data_df.loc[pd.Series(cellnames,index=cellnames).index,:]
         cluster_names=MouseC1data_df3.pop(key)
