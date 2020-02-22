@@ -208,7 +208,7 @@ def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=f
     MousePseudoBulk = pd.DataFrame(columns=Main_cell_types,index=genenames)
     print(Main_cell_types)
     for key in Main_cell_types:
-        temp=MouseC1data[MouseC1data.obs[cell_type]==key,:].to_df()
+        temp=MouseC1data[MouseC1data.obs[cell_type]==key].to_df()
         temp[cell_type]=key
         temp2 = temp.groupby(by=cell_type).mean()
         del temp
