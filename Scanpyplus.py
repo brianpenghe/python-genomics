@@ -41,7 +41,7 @@ def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlab
     if 'default' in stagelist:
         stagelist = sorted(adata.obs[stagekey].unique().tolist(),key=stagekeytype)
     colors=list(adata.uns[celltypekey+'_colors'])
-    count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]))
+    count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]).loc[celltypelist,stagelist])
     count_ratio_array=count_array / np.sum(count_array,axis=0)
     for i in range(len(celltypelist)):
         plt.barh(stagelist[::-1],count_ratio_array[i,::-1],
