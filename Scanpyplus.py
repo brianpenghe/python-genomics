@@ -34,6 +34,9 @@ def ExtractColor(adata,obsKey='louvain',keytype=int):
     colors=list(adata.uns[obsKey+'_colors'])
     return dict(zip(labels,colors))
 
+def GetRaw(adata_all):
+    return anndata.AnnData(X=adata_all.raw.X,obs=adata_all.obs,var=adata_all.raw.var)
+
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str):
     if 'default' in celltypelist:
