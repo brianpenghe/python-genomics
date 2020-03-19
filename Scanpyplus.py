@@ -115,7 +115,7 @@ def Bertie(adata,Resln=1,batch_key='batch'):
         scrub = scr.Scrublet(adata_sample.X)
         doublet_scores, predicted_doublets = scrub.scrub_doublets(verbose=False)
         adata_sample.obs['scrublet_score'] = doublet_scores
-
+        adata_sample=adata_sample.copy()
         sc.pp.filter_genes(adata_sample, min_cells=3)
         sc.pp.normalize_per_cell(adata_sample, counts_per_cell_after=1e4)
         sc.pp.log1p(adata_sample)
@@ -153,6 +153,7 @@ def Bertie(adata,Resln=1,batch_key='batch'):
         #plt.savefig('limb/sample_'+i+'_doulet_histogram.pdf')
         adata.obs.loc[adata.obs[batch_key]==i,'doublet_scores']=doublet_scores
         adata.obs.loc[adata.obs[batch_key]==i,'bh_pval'] = bh(pvals)
+        del adata_sample
     return adata
 
 
