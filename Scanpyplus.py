@@ -28,6 +28,9 @@ import os
 from scipy import sparse
 from scipy import cluster
 from glob import iglob
+from upsetplot import UpSet
+from upsetplot import plot
+
 
 def ExtractColor(adata,obsKey='louvain',keytype=int):
     labels=sorted(adata.obs[obsKey].unique().to_list(),key=keytype)
@@ -247,6 +250,14 @@ def DeepTree(adata,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_varia
                            cellnames=cellnames,gene_type='null',cell_type=cell_type,method=method,\
                            figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
     return [bdata,test,test1,test2]
+
+def Venn_Upset(adata,genelists,size_height=3):
+    #gene lists can be ['Deep_1','Deep_2']
+    deepgenes=pd.DataFrame(adata.var[genelists+['highly_variable']])
+    deepgenes=deepgenes.set_index(genelists)
+    upset = UpSet(deepgenes, subset_size='count', intersection_plot_elements=size_height)
+    upset.plot()
+    return upset
 
 def DeepTree2(adata,method='complete',metric='correlation',cellnames=['default'],genenames=['default'],\
                Cutoff=0.8,CladeSize=2):
