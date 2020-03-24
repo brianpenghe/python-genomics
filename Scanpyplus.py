@@ -169,8 +169,11 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
         genenames = MouseC1data.var_names
     genenames = np.intersect1d(np.array(MouseC1data.var_names),np.array(genenames))
     cell_types=cell_type
+    gene_types=gene_type
     if type(cell_type) == str:
         cell_types=[cell_type]
+    if type(gene_type) == str:
+        gene_types=[gene_type]
     louvain_col_colors=[]
     for key in cell_types: 
         MouseC1data_df = MouseC1data[MouseC1data.obs_names][:,genenames].to_df()
@@ -185,13 +188,19 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
         louvain_col_colors=pd.concat(louvain_col_colors,axis=1)
     else:
         louvain_col_colors=louvain_col_colors[0]
-    if gene_type == 'null':
+    if 'null' in gene_types:
         cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap='RdYlBu_r',\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
                  z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,method=method)
     else:
-        genegroup_names=MouseC1data[:,genenames].var[gene_type]
-        celltype_row_colors=genegroup_names.map(MouseC1ColorDict2)
+        celltype_row_colors=[]
+        for key in gene_types:
+            genegroup_names=MouseC1data[:,genenames].var[key]
+            celltype_row_colors.append(genegroup_names.map(MouseC1ColorDict2).astype(str))
+        if len(celltype_row_colors) > 1:
+            celltype_row_colors=pd.concat(celltype_row_colors,axis=1)
+        else:
+            celltype_row_colors=celltype_row_colors[0]
         cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap='RdYlBu_r',\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
                  z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,row_colors=celltype_row_colors,method=method)
