@@ -15,7 +15,7 @@ from sklearn.cluster import SpectralClustering
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.externals import joblib
+import joblib
 from pysankey.sankey import sankey
 #not that it used to be called pySankey with uppercase "s"
 
