@@ -40,6 +40,13 @@ def ExtractColor(adata,obsKey='louvain',keytype=int):
 def GetRaw(adata_all):
     return anndata.AnnData(X=adata_all.raw.X,obs=adata_all.obs,var=adata_all.raw.var)
 
+def CalculateRaw(adata,scaling_factor=10000):
+    #The object must contain a log-transformed matrix
+    #This function returns an integer-count object
+    #The normalization constant is assumed to be 10000
+    return anndata.AnnData(X=np.rint(np.array(np.expm1(adata.X).todense().transpose())*(adata.obs['n_counts'].values).transpose() / 100000).transpose(),\
+                  obs=adata.obs,var=adata.var)
+
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str):
     if 'default' in celltypelist:
