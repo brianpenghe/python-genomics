@@ -45,7 +45,7 @@ def CalculateRaw(adata,scaling_factor=10000):
     #The object must contain a log-transformed matrix
     #This function returns an integer-count object
     #The normalization constant is assumed to be 10000
-    return anndata.AnnData(X=sparse.csr_matrix(np.rint(np.array(np.expm1(adata.X).todense().transpose())*(adata.obs['n_counts'].values).transpose() / 100000).transpose()),\
+    return anndata.AnnData(X=sparse.csr_matrix(np.rint(np.array(np.expm1(adata.X).todense().transpose())*(adata.obs['n_counts'].values).transpose() / scaling_factor).transpose()),\
                   obs=adata.obs,var=adata.var)
 
 def file2gz(file,delete_original=True):
@@ -57,14 +57,14 @@ def file2gz(file,delete_original=True):
 def Scanpy2MM(adata,prefix='temp'):
     #Scanpy2MM(adata,"./")
     #please make sure the object contains raw counts (using our CalculateRaw function)
-    scipy.io.mmwrite(prefix+'matrix.mtx',adata.X,field='integer')
+    scipy.io.mmwrite(prefix+'matrix.mtx',adata.X.transpose(),field='integer')
     adata.var[['gene_ids','feature_types']].reset_index().set_index(keys='gene_ids').to_csv(prefix+"features.tsv", \
             sep = "\t", index= True,header=False)
     adata.obs.to_csv(prefix+"barcodes.tsv", sep = "\t", columns=[],header= False)
     adata.obs.to_csv(prefix+"metadata.tsv", sep = "\t", index= True)
     file2gz(prefix+"matrix.mtx")
     file2gz(prefix+"barcodes.tsv")
-    file2gz(prefix+"metadata.tsv")
+    ##file2gz(prefix+"metadata.tsv")
     file2gz(prefix+"features.tsv")
 
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
