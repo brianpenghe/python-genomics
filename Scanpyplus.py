@@ -189,12 +189,13 @@ def Bertie(adata,Resln=1,batch_key='batch'):
 
 def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
-            robust=True,xticklabels=False,method='complete',metric='correlation'):
+            robust=True,xticklabels=False,method='complete',metric='correlation',cmap='RdYlBu_r'):
     if 'default' in cellnames:
         cellnames = MouseC1data.obs_names
     if 'default' in genenames:
         genenames = MouseC1data.var_names
     genenames = [i for i in genenames if i in MouseC1data.var_names] 
+    cellnames = [i for i in genenames if i in MouseC1data.obs_names]
     cell_types=cell_type
     gene_types=gene_type
     if type(cell_type) == str:
@@ -216,7 +217,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
     else:
         louvain_col_colors=louvain_col_colors[0]
     if 'null' in gene_types:
-        cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap='RdYlBu_r',\
+        cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap=cmap,\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
                  z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,method=method)
     else:
@@ -228,7 +229,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
             celltype_row_colors=pd.concat(celltype_row_colors,axis=1)
         else:
             celltype_row_colors=celltype_row_colors[0]
-        cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap='RdYlBu_r',\
+        cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap=cmap,\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
                  z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,row_colors=celltype_row_colors,method=method)
 
