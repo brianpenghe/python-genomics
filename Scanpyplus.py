@@ -189,7 +189,7 @@ def Bertie(adata,Resln=1,batch_key='batch'):
 
 def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
-            robust=True,xticklabels=False,method='complete',metric='correlation'):
+            robust=True,xticklabels=False,yticklabels=False,method='complete',metric='correlation'):
     if 'default' in cellnames:
         cellnames = MouseC1data.obs_names
     if 'default' in genenames:
@@ -219,7 +219,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
     if 'null' in gene_types:
         cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap='RdYlBu_r',\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
-                 z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,method=method)
+                 yticklabels=yticklabels,z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,method=method)
     else:
         celltype_row_colors=[]
         for key in gene_types:
@@ -231,17 +231,23 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
             celltype_row_colors=celltype_row_colors[0]
         cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap='RdYlBu_r',\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
-                 z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,row_colors=celltype_row_colors,method=method)
+                 yticklabels=yticklabels,z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,row_colors=celltype_row_colors,method=method)
 
     return cg1_0point2
 
-def markSeaborn(snsObj,genes):
-    NewIndex=pd.DataFrame(np.asarray([snsObj.data.index[i] for i in snsObj.dendrogram_row.reordered_ind])).ix[:,0]
-    NewIndex2=NewIndex.isin(genes)
-    snsObj.ax_heatmap.set_yticks(NewIndex[NewIndex2].index.values.tolist())
-    snsObj.ax_heatmap.set_yticklabels(NewIndex[NewIndex2].values.tolist())
-    snsObj.fig
-    return snsObj
+def markSeaborn(snsObj,genes,clustermap=True):
+    if clustermap == True:
+        NewIndex=pd.DataFrame(np.asarray([snsObj.data.index[i] for i in snsObj.dendrogram_row.reordered_ind])).ix[:,0]
+        NewIndex2=NewIndex.isin(genes)
+        snsObj.ax_heatmap.set_yticks(NewIndex[NewIndex2].index.values.tolist())
+        snsObj.ax_heatmap.set_yticklabels(NewIndex[NewIndex2].values.tolist())
+    else:
+        NewIndex=pd.DataFrame(np.asarray(snsObj.data.index))
+        NewIndex2=snsObj.data.index.isin(genes)
+        snsObj.ax_heatmap.set_yticks(NewIndex[NewIndex2].index.values)
+        snsObj.ax_heatmap.set_yticklabels(NewIndex[NewIndex2].values[:,0])
+    #snsObj.fig
+    return snsObj.fig
 
 def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=float):
     if 'default' in genenames:
