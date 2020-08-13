@@ -186,6 +186,65 @@ def Bertie(adata,Resln=1,batch_key='batch'):
         del adata_sample
     return adata
 
+def Bertie_preclustered(adata,batch_key='batch',cluster_key='louvain'):
+    scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
+    adata.obs['doublet_scores']=0
+    def bh(pvalues):
+        '''
+        Computes the Benjamini-Hochberg FDR correction.
+
+        Input:
+            * pvals - vector of p-values to correct
+        '''
+        n = int(pvalues.shape[0])
+        new_pvalues = np.empty(n)
+        values = [ (pvalue, i) for i, pvalue in enumerate(pvalues) ]
+        values.sort()
+        values.reverse()
+        new_values = []
+        for i, vals in enumerate(values):
+            rank = n - i
+            pvalue, index = vals
+            new_values.append((n/rank) * pvalue)
+        for i in range(0, int(n)-1):
+            if new_values[i] < new_values[i+1]:
+                new_values[i+1] = new_values[i]
+        for i, vals in enumerate(values):
+            pvalue, index = vals
+            new_pvalues[index] = new_values[i]
+        return new_pvalues
+
+    for i in np.unique(adata.obs[batch_key]):
+        adata_sample = adata[adata.obs[batch_key]==i,:]
+        scrub = scr.Scrublet(adata_sample.X)
+        doublet_scores, predicted_doublets = scrub.scrub_doublets(verbose=False)
+        adata_sample.obs['scrublet_score'] = doublet_scores
+        adata_sample=adata_sample.copy()
+
+        for clus in np.unique(adata_sample.obs[cluster_key]):
+            adata_sample.obs.loc[adata_sample.obs[cluster_key]==clus, 'scrublet_cluster_score'] = \
+                np.median(adata_sample.obs.loc[adata_sample.obs[cluster_key]==clus, 'scrublet_score'])
+
+        med = np.median(adata_sample.obs['scrublet_cluster_score'])
+        mask = adata_sample.obs['scrublet_cluster_score']>med
+        mad = np.median(adata_sample.obs['scrublet_cluster_score'][mask]-med)
+        #let's do a one-sided test. the Bertie write-up does not address this but it makes sense
+        pvals = 1-scipy.stats.norm.cdf(adata_sample.obs['scrublet_cluster_score'], loc=med, scale=1.4826*mad)
+        adata_sample.obs['bh_pval'] = bh(pvals)
+        #create results data frame for single sample and copy stuff over from the adata object
+        scrublet_sample = pd.DataFrame(0, index=adata_sample.obs_names, columns=scorenames)
+        for meta in scorenames:
+            scrublet_sample[meta] = adata_sample.obs[meta]
+        #write out complete sample scores
+        #scrublet_sample.to_csv('scrublet-scores/'+i+'.csv')
+
+        scrub.plot_histogram();
+        #plt.savefig('limb/sample_'+i+'_doulet_histogram.pdf')
+        adata.obs.loc[adata.obs[batch_key]==i,'doublet_scores']=doublet_scores
+        adata.obs.loc[adata.obs[batch_key]==i,'bh_pval'] = bh(pvals)
+        del adata_sample
+    return adata
+
 
 def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
