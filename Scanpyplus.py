@@ -48,6 +48,11 @@ def CalculateRaw(adata,scaling_factor=10000):
     return anndata.AnnData(X=sparse.csr_matrix(np.rint(np.array(np.expm1(adata.X).todense().transpose())*(adata.obs['n_counts'].values).transpose() / scaling_factor).transpose()),\
                   obs=adata.obs,var=adata.var)
 
+def remove_barcode_suffix(adata):
+    bdata=adata.copy()
+    bdata.obs_names=pd.Index([i[0] for i in bdata.obs_names.str.split('-',expand=True)])
+    return bdata
+
 def file2gz(file,delete_original=True):
     with open(file,'rb') as src, gzip.open(file+'.gz','wb') as dst:
         dst.writelines(src)
