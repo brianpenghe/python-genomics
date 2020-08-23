@@ -402,7 +402,7 @@ def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidat
     Reference2 = Reference[:,IntersectGenes]
     Query2 = Query[:,IntersectGenes]
     X = Reference2.X
-    y = Reference2.obs[Category]
+    y = Reference2.obs[Category].replace(np.nan,'None',regex=True)
     x = Query2.X
     cv = StratifiedKFold(n_splits=5, random_state=None, shuffle=False)
     logit = LogisticRegression(penalty='l2',
