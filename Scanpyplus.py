@@ -48,6 +48,17 @@ def CalculateRaw(adata,scaling_factor=10000):
     return anndata.AnnData(X=sparse.csr_matrix(np.rint(np.array(np.expm1(adata.X).todense().transpose())*(adata.obs['n_counts'].values).transpose() / scaling_factor).transpose()),\
                   obs=adata.obs,var=adata.var)
 
+def OrthoTranslate(adata,oTable='/mnt/190308Hongbohindlimb/mouse/Mouse-Human orthologs.txt'):
+    OrthologTable = pd.read_table(oTable).dropna()
+    MouseGenes=OrthologTable.loc[:,'Gene name'].drop_duplicates(keep=False)
+    HumanGenes=OrthologTable.loc[:,'Human gene name'].drop_duplicates(keep=False)
+    FilteredTable=OrthologTable.loc[((OrthologTable.loc[:,'Gene name'].isin(MouseGenes)) &\
+                            (OrthologTable.loc[:,'Human gene name'].isin(HumanGenes))),:]
+    bdata=adata[:,adata.var_names.isin(FilteredTable.loc[:,'Gene name'])]
+    FilteredTable.set_index('Gene name',inplace=True,drop=False)
+    bdata.var_names=FilteredTable.loc[bdata.var_names,'Human gene name']
+    return bdata
+
 def remove_barcode_suffix(adata):
     bdata=adata.copy()
     bdata.obs_names=pd.Index([i[0] for i in bdata.obs_names.str.split('-',expand=True)])
