@@ -23,12 +23,13 @@ from pysankey.sankey import sankey
 import numpy as np
 import pandas as pd
 #import scanpy.api as sc
-#import anndata
+import anndata
 #import bbknn
 import os
 from scipy import sparse
 from scipy import cluster
 from glob import iglob
+from upsetplot import UpSet
 
 def show_graph_with_labels(adjacency_matrix):
     rows, cols = np.where(adjacency_matrix.values >= 0.9)
@@ -39,3 +40,18 @@ def show_graph_with_labels(adjacency_matrix):
             labels={i : adjacency_matrix.index.values.tolist()[i] for i in range(0, len(adjacency_matrix.index.values) ) }, 
             with_labels=True)
     plt.show()
+
+def DF2Ann(DF):
+    #This function converts a dataframe to AnnData
+    #Make sure to transpose if needed
+    return(anndata.AnnData(DF))
+
+def UpSetFromLists(listOflist,labels,size_height=3):
+    listall=list(set([j for i in listOflist for j in i]))
+    temp=pd.Series(listall,index=listall)
+    temp2=pd.concat([temp.isin(i) for i in listOflist+[temp]],axis=1)
+    temp2.columns=labels+['all']
+    temp2=temp2.set_index(labels)
+    upset = UpSet(temp2,subset_size='count', intersection_plot_elements=3)
+    upset.plot()
+    return upset

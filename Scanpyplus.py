@@ -48,6 +48,22 @@ def CalculateRaw(adata,scaling_factor=10000):
     return anndata.AnnData(X=sparse.csr_matrix(np.rint(np.array(np.expm1(adata.X).todense().transpose())*(adata.obs['n_counts'].values).transpose() / scaling_factor).transpose()),\
                   obs=adata.obs,var=adata.var)
 
+def OrthoTranslate(adata,oTable='/mnt/190308Hongbohindlimb/mouse/Mouse-Human orthologs.txt'):
+    OrthologTable = pd.read_table(oTable).dropna()
+    MouseGenes=OrthologTable.loc[:,'Gene name'].drop_duplicates(keep=False)
+    HumanGenes=OrthologTable.loc[:,'Human gene name'].drop_duplicates(keep=False)
+    FilteredTable=OrthologTable.loc[((OrthologTable.loc[:,'Gene name'].isin(MouseGenes)) &\
+                            (OrthologTable.loc[:,'Human gene name'].isin(HumanGenes))),:]
+    bdata=adata[:,adata.var_names.isin(FilteredTable.loc[:,'Gene name'])]
+    FilteredTable.set_index('Gene name',inplace=True,drop=False)
+    bdata.var_names=FilteredTable.loc[bdata.var_names,'Human gene name']
+    return bdata
+
+def remove_barcode_suffix(adata):
+    bdata=adata.copy()
+    bdata.obs_names=pd.Index([i[0] for i in bdata.obs_names.str.split('-',expand=True)])
+    return bdata
+
 def file2gz(file,delete_original=True):
     with open(file,'rb') as src, gzip.open(file+'.gz','wb') as dst:
         dst.writelines(src)
@@ -186,16 +202,76 @@ def Bertie(adata,Resln=1,batch_key='batch'):
         del adata_sample
     return adata
 
+def Bertie_preclustered(adata,batch_key='batch',cluster_key='louvain'):
+    scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
+    adata.obs['doublet_scores']=0
+    def bh(pvalues):
+        '''
+        Computes the Benjamini-Hochberg FDR correction.
+
+        Input:
+            * pvals - vector of p-values to correct
+        '''
+        n = int(pvalues.shape[0])
+        new_pvalues = np.empty(n)
+        values = [ (pvalue, i) for i, pvalue in enumerate(pvalues) ]
+        values.sort()
+        values.reverse()
+        new_values = []
+        for i, vals in enumerate(values):
+            rank = n - i
+            pvalue, index = vals
+            new_values.append((n/rank) * pvalue)
+        for i in range(0, int(n)-1):
+            if new_values[i] < new_values[i+1]:
+                new_values[i+1] = new_values[i]
+        for i, vals in enumerate(values):
+            pvalue, index = vals
+            new_pvalues[index] = new_values[i]
+        return new_pvalues
+
+    for i in np.unique(adata.obs[batch_key]):
+        adata_sample = adata[adata.obs[batch_key]==i,:]
+        scrub = scr.Scrublet(adata_sample.X)
+        doublet_scores, predicted_doublets = scrub.scrub_doublets(verbose=False)
+        adata_sample.obs['scrublet_score'] = doublet_scores
+        adata_sample=adata_sample.copy()
+
+        for clus in np.unique(adata_sample.obs[cluster_key]):
+            adata_sample.obs.loc[adata_sample.obs[cluster_key]==clus, 'scrublet_cluster_score'] = \
+                np.median(adata_sample.obs.loc[adata_sample.obs[cluster_key]==clus, 'scrublet_score'])
+
+        med = np.median(adata_sample.obs['scrublet_cluster_score'])
+        mask = adata_sample.obs['scrublet_cluster_score']>med
+        mad = np.median(adata_sample.obs['scrublet_cluster_score'][mask]-med)
+        #let's do a one-sided test. the Bertie write-up does not address this but it makes sense
+        pvals = 1-scipy.stats.norm.cdf(adata_sample.obs['scrublet_cluster_score'], loc=med, scale=1.4826*mad)
+        adata_sample.obs['bh_pval'] = bh(pvals)
+        #create results data frame for single sample and copy stuff over from the adata object
+        scrublet_sample = pd.DataFrame(0, index=adata_sample.obs_names, columns=scorenames)
+        for meta in scorenames:
+            scrublet_sample[meta] = adata_sample.obs[meta]
+        #write out complete sample scores
+        #scrublet_sample.to_csv('scrublet-scores/'+i+'.csv')
+
+        scrub.plot_histogram();
+        #plt.savefig('limb/sample_'+i+'_doulet_histogram.pdf')
+        adata.obs.loc[adata.obs[batch_key]==i,'doublet_scores']=doublet_scores
+        adata.obs.loc[adata.obs[batch_key]==i,'bh_pval'] = bh(pvals)
+        del adata_sample
+    return adata
+
 
 def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
-            robust=True,xticklabels=False,method='complete',metric='correlation',cmap='RdYlBu_r'):
+
+            robust=True,xticklabels=False,yticklabels=False,method='complete',metric='correlation'):
     if 'default' in cellnames:
         cellnames = MouseC1data.obs_names
     if 'default' in genenames:
         genenames = MouseC1data.var_names
-    genenames = [i for i in genenames if i in MouseC1data.var_names] 
-    cellnames = [i for i in genenames if i in MouseC1data.obs_names]
+    genenames = [i for i in genenames if i in MouseC1data.var_names]
+    cellnames = [i for i in cellnames if i in MouseC1data.obs_names]
     cell_types=cell_type
     gene_types=gene_type
     if type(cell_type) == str:
@@ -219,7 +295,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
     if 'null' in gene_types:
         cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap=cmap,\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
-                 z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,method=method)
+                 yticklabels=yticklabels,z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,method=method)
     else:
         celltype_row_colors=[]
         for key in gene_types:
@@ -231,17 +307,23 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
             celltype_row_colors=celltype_row_colors[0]
         cg1_0point2=sns.clustermap(adata_for_plotting.transpose(),metric=metric,cmap=cmap,\
                  figsize=figsize,row_cluster=row_cluster,col_cluster=col_cluster,robust=robust,xticklabels=xticklabels,\
-                 z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,row_colors=celltype_row_colors,method=method)
+                 yticklabels=yticklabels,z_score=0,vmin=-2.5,vmax=2.5,col_colors=louvain_col_colors,row_colors=celltype_row_colors,method=method)
 
     return cg1_0point2
 
-def markSeaborn(snsObj,genes):
-    NewIndex=pd.DataFrame(np.asarray([snsObj.data.index[i] for i in snsObj.dendrogram_row.reordered_ind])).ix[:,0]
-    NewIndex2=NewIndex.isin(genes)
-    snsObj.ax_heatmap.set_yticks(NewIndex[NewIndex2].index.values.tolist())
-    snsObj.ax_heatmap.set_yticklabels(NewIndex[NewIndex2].values.tolist())
-    snsObj.fig
-    return snsObj
+def markSeaborn(snsObj,genes,clustermap=True):
+    if clustermap == True:
+        NewIndex=pd.DataFrame(np.asarray([snsObj.data.index[i] for i in snsObj.dendrogram_row.reordered_ind])).ix[:,0]
+        NewIndex2=NewIndex.isin(genes)
+        snsObj.ax_heatmap.set_yticks(NewIndex[NewIndex2].index.values.tolist())
+        snsObj.ax_heatmap.set_yticklabels(NewIndex[NewIndex2].values.tolist())
+    else:
+        NewIndex=pd.DataFrame(np.asarray(snsObj.data.index))
+        NewIndex2=snsObj.data.index.isin(genes)
+        snsObj.ax_heatmap.set_yticks(NewIndex[NewIndex2].index.values)
+        snsObj.ax_heatmap.set_yticklabels(NewIndex[NewIndex2].values[:,0])
+    #snsObj.fig
+    return snsObj.fig
 
 def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=float):
     if 'default' in genenames:
@@ -321,7 +403,7 @@ def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidat
     Reference2 = Reference[:,IntersectGenes]
     Query2 = Query[:,IntersectGenes]
     X = Reference2.X
-    y = Reference2.obs[Category]
+    y = Reference2.obs[Category].replace(np.nan,'None',regex=True)
     x = Query2.X
     cv = StratifiedKFold(n_splits=5, random_state=None, shuffle=False)
     logit = LogisticRegression(penalty='l2',
