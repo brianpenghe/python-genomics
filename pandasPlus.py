@@ -19,7 +19,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 import joblib
 from pysankey.sankey import sankey
 #not that it used to be called pySankey with uppercase "s"
-
+import scipy.stats
 import numpy as np
 import pandas as pd
 #import scanpy.api as sc
@@ -55,3 +55,12 @@ def UpSetFromLists(listOflist,labels,size_height=3):
     upset = UpSet(temp2,subset_size='count', intersection_plot_elements=3)
     upset.plot()
     return upset
+
+def zscore(DF,dropna=True,axis=1):
+    output=pd.DataFrame(scipy.stats.zscore(DF.values,axis=1),
+             index=DF.index,
+            columns=DF.columns)
+    if dropna==True:
+        return output.dropna(axis=1-axis)
+    return output
+
