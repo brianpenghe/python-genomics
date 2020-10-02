@@ -22,7 +22,7 @@ from pysankey.sankey import sankey
 
 import numpy as np
 import pandas as pd
-import scanpy.api as sc
+import scanpy as sc
 import anndata
 import bbknn
 import os
@@ -127,6 +127,17 @@ def mtx2df(mtx,idx,col):
                         index=idxs,
                         columns=cols)
     return sc_count 
+
+def DEmarkers(adata,celltype,reference,obs,max_out_group_fraction=0.25,\
+use_raw=False,length=100,obslist=['percent_mito','n_counts','batch']):
+    celltype=celltype
+    sc.tl.rank_genes_groups(adata, obs, groups=[celltype], 
+                        reference=reference,method='wilcoxon')
+    sc.tl.filter_rank_genes_groups(adata, groupby=obs,max_out_group_fraction=max_out_group_fraction)
+    sc.pl.umap(adata,color=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names']).loc[:,celltype].dropna().head(length).transpose().tolist()+obslist,
+           color_map = 'jet',use_raw=use_raw)
+    sc.pl.dotplot(adata,var_names=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names']).loc[:,celltype].dropna().head(length).transpose().tolist(),
+             groupby=obs,use_raw=use_raw)
 
 def Bertie(adata,Resln=1,batch_key='batch'):
     scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
