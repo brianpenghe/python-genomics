@@ -299,7 +299,7 @@ def Bertie_preclustered(adata,batch_key='batch',cluster_key='louvain'):
 def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
 
-            robust=True,xticklabels=False,yticklabels=False,method='complete',metric='correlation'):
+            robust=True,xticklabels=False,yticklabels=False,method='complete',metric='correlation',cmap='jet'):
     if 'default' in cellnames:
         cellnames = MouseC1data.obs_names
     if 'default' in genenames:
@@ -403,6 +403,26 @@ def DeepTree(adata,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_varia
                            cellnames=cellnames,gene_type='null',cell_type=cell_type,method=method,\
                            figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
     return [bdata,test,test1,test2]
+
+def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch']):
+    for key in adata.obs[batch_key].unique():
+        print(key)
+        bdata=adata[:,adata.var['highly_variable'+key]][adata.obs[batch_key]==key,:]
+        sc.pp.filter_genes(bdata,min_cells=3)
+        [bdata,test, test1, test2]=DeepTree(bdata,
+                        MouseC1ColorDict2={False:'#000000',True:'#00FFFF'},
+                        cell_type=obslist,
+                        cellnames=adata[adata.obs[batch_key]==key,:].obs_names.tolist(),
+                        genenames=adata[:,adata.var['highly_variable'+key]].var_names.tolist(),
+                         row_cluster=True,col_cluster=True)
+        adata.var['Deep_'+key]=pd.Series(adata.var_names,index=adata.var_names).isin((bdata)[:,bdata.var['Deep']].var_names)
+        sc.pl.umap(adata,color=obslist)
+    adata.var['Deep_n']=0
+    temp=adata.var['Deep_n'].astype('int32')
+    for key in adata.obs[batch_key].unique():
+        temp=temp+adata.var['Deep_n'+key].astype('int32')
+    adata.var['Deep_n']=temp
+    return adata
 
 def Venn_Upset(adata,genelists,size_height=3):
     #gene lists can be ['Deep_1','Deep_2']
