@@ -138,10 +138,24 @@ min_fold_change=2,min_in_group_fraction=0.25,log=True):
                     max_out_group_fraction=max_out_group_fraction,
                     min_fold_change=min_fold_change,use_raw=use_raw,
                     min_in_group_fraction=0.25,log=log)
-    sc.pl.umap(adata,color=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names']).loc[:,celltype].dropna().head(length).transpose().tolist()+obslist,
+    GeneList=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names']).loc[:,celltype].dropna().head(length).transpose().tolist()
+    sc.pl.umap(adata,color=GeneList+obslist,
            color_map = 'jet',use_raw=use_raw)
-    sc.pl.dotplot(adata,var_names=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names']).loc[:,celltype].dropna().head(length).transpose().tolist(),
+    sc.pl.dotplot(adata,var_names=GeneList,
              groupby=obs,use_raw=use_raw)
+    sc.pl.stacked_violin(adata[adata.obs[obs].isin([celltype,reference]),:],var_names=GeneList,groupby=obs,
+           swap_axes=True)
+
+def HVGbyBatch(adata,batch_key='batch',min_mean=0.0125, max_mean=3, min_disp=0.5):
+    sc.settings.verbosity=0
+    for key in adata.obs['batch'].unique():
+        adata_sample = adata[adata.obs['batch']==key,:]
+        print(key)
+        sc.pp.highly_variable_genes(adata_sample, min_mean=min_mean, max_mean=max_mean, min_disp=min_disp)
+        adata.var['highly_variable'+key]=pd.Series(adata.var_names,\
+            index=adata.var_names).isin(adata_sample.var_names[adata_sample.var['highly_variable']])
+    sc.settings.verbosity=3
+    return adata
 
 def Bertie(adata,Resln=1,batch_key='batch'):
     scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
