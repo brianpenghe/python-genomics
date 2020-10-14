@@ -347,7 +347,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
 
 def markSeaborn(snsObj,genes,clustermap=True):
     if clustermap == True:
-        NewIndex=pd.DataFrame(np.asarray([snsObj.data.index[i] for i in snsObj.dendrogram_row.reordered_ind])).ix[:,0]
+        NewIndex=pd.DataFrame(np.asarray([snsObj.data.index[i] for i in snsObj.dendrogram_row.reordered_ind])).iloc[:,0]
         NewIndex2=NewIndex.isin(genes)
         snsObj.ax_heatmap.set_yticks(NewIndex[NewIndex2].index.values.tolist())
         snsObj.ax_heatmap.set_yticklabels(NewIndex[NewIndex2].values.tolist())
