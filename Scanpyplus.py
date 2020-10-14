@@ -148,13 +148,18 @@ min_fold_change=2,min_in_group_fraction=0.25,log=True):
 
 def HVGbyBatch(adata,batch_key='batch',min_mean=0.0125, max_mean=3, min_disp=0.5):
     sc.settings.verbosity=0
-    for key in adata.obs['batch'].unique():
-        adata_sample = adata[adata.obs['batch']==key,:]
+    for key in adata.obs[batch_key].unique():
+        adata_sample = adata[adata.obs[batch_key]==key,:]
         print(key)
         sc.pp.highly_variable_genes(adata_sample, min_mean=min_mean, max_mean=max_mean, min_disp=min_disp)
         adata.var['highly_variable'+key]=pd.Series(adata.var_names,\
             index=adata.var_names).isin(adata_sample.var_names[adata_sample.var['highly_variable']])
     sc.settings.verbosity=3
+    adata.var['highly_variable_n']=0
+    temp=adata.var['highly_variable_n'].astype('int32')
+    for key in adata.obs[batch_key].unique():
+        temp=temp+adata.var['highly_variable'+key].astype('int32')
+    adata.var['highly_variable_n']=temp
     return adata
 
 def Bertie(adata,Resln=1,batch_key='batch'):
