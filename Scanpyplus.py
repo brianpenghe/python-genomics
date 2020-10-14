@@ -420,7 +420,7 @@ def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch']):
     adata.var['Deep_n']=0
     temp=adata.var['Deep_n'].astype('int32')
     for key in adata.obs[batch_key].unique():
-        temp=temp+adata.var['Deep_n'+key].astype('int32')
+        temp=temp+adata.var['Deep_'+key].astype('int32')
     adata.var['Deep_n']=temp
     return adata
 
