@@ -83,6 +83,22 @@ def Scanpy2MM(adata,prefix='temp'):
     ##file2gz(prefix+"metadata.tsv")
     file2gz(prefix+"features.tsv")
 
+def ShiftEmbedding(adata,domain_key='batch',embedding='X_umap',ncols=3,alpha=0.9):
+    from sklearn import preprocessing
+    scaler = preprocessing.MinMaxScaler()
+    adata.obs[embedding+'0']=adata.obsm[embedding][:,0]
+    adata.obs[embedding+'1']=adata.obsm[embedding][:,1]
+    X=adata.obs[embedding+'0']
+    Y=adata.obs[embedding+'1']
+    batch_categories=adata.obs[domain_key].unique()
+    for i in list(range(len(batch_categories))):
+        temp=adata[adata.obs.big_cluster==batch_categories[i]].obsm[embedding]
+        scaler.fit(temp)
+        X.loc[adata.obs.big_cluster==batch_categories[i]]=(scaler.transform(temp)*alpha+ [i/ncols,i%ncols])[:,0]
+        Y.loc[adata.obs.big_cluster==batch_categories[i]]=(scaler.transform(temp)*alpha+ [i/ncols,i%ncols])[:,1]
+    adata.obsm[embedding]=np.vstack((X.values,Y.values)).T
+    return adata
+
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str):
     if 'default' in celltypelist:
