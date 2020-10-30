@@ -64,3 +64,8 @@ def zscore(DF,dropna=True,axis=1):
         return output.dropna(axis=1-axis)
     return output
 
+def Ginni(beta):
+    #beta is a DataFrame with columns of distributions
+    beta.loc['Ginni']=[np.abs(np.subtract.outer(beta.loc[:,i].values,\
+               beta.loc[:,i].values)).mean()/np.mean(beta.loc[:,i].values)*0.5 for i in beta.columns]
+    return beta
