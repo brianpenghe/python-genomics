@@ -491,6 +491,6 @@ def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidat
         scores = cross_val_score(logit, X, y, cv=cv)
 
     _ = joblib.dump(result,str(today)+'Sklearn.result.joblib.pkl',compress=9)
-
+    np.savetxt(str(today)+'Sklearn.result.csv',IntersectGenes,fmt='%s',delimiter=',')
     Query.obs['Predicted'] = y_predict
     return Query
