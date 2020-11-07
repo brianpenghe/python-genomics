@@ -148,7 +148,7 @@ def DEmarkers(adata,celltype,reference,obs,max_out_group_fraction=0.25,\
 use_raw=False,length=100,obslist=['percent_mito','n_counts','batch'],\
 min_fold_change=2,min_in_group_fraction=0.25,log=True):
     celltype=celltype
-    sc.tl.rank_genes_groups(adata, obs, groups=[celltype], 
+    sc.tl.rank_genes_groups(adata, obs, groups=[celltype],
                         reference=reference,method='wilcoxon',log=log)
     sc.tl.filter_rank_genes_groups(adata, groupby=obs,\
                     max_out_group_fraction=max_out_group_fraction,
@@ -312,6 +312,13 @@ def Bertie_preclustered(adata,batch_key='batch',cluster_key='louvain'):
     return adata
 
 
+def snsSplitViolin(adata,genelist,celltype='leiden',celltypelist=['0','1']):
+    df=sc.get.obs_df(adata[adata.obs[celltype].isin(celltypelist)],genelist+[celltype])
+    df = df.set_index(celltype).stack().reset_index()
+    df.columns=[celltype,'gene','value']
+    sns.violinplot(data=df, x='gene', y='value', hue=celltype,
+                split=True, inner="quart", linewidth=1)
+
 def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
 
@@ -375,7 +382,7 @@ def markSeaborn(snsObj,genes,clustermap=True):
     #snsObj.fig
     return snsObj.fig
 
-def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=float):
+def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=float,metric='mean'):
     if 'default' in genenames:
         genenames = MouseC1data.var_names
     Main_cell_types = MouseC1data.obs[cell_type].unique()
@@ -386,7 +393,10 @@ def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=f
     for key in Main_cell_types:
         temp=MouseC1data[MouseC1data.obs[cell_type]==key].to_df()
         temp[cell_type]=key
-        temp2 = temp.groupby(by=cell_type).mean()
+        if metric=='mean':
+            temp2 = temp.groupby(by=cell_type).mean()
+        elif metric=='median':
+            temp2 = temp.groupby(by=cell_type).median()
         del temp
         MousePseudoBulk.loc[:,key]=temp2.loc[key,:].transpose()
         del temp2
@@ -494,3 +504,33 @@ def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidat
     np.savetxt(str(today)+'Sklearn.result.csv',IntersectGenes,fmt='%s',delimiter=',')
     Query.obs['Predicted'] = y_predict
     return Query
+
+def LogisticPrediction(adata,model_pkl,genelistcsv):
+    #This function imports saved logistic model and gene list csv to predict cell types for adata
+    #adata has better been scaled if you trained a model using scaled AnnData
+    import joblib
+    CT_genes=pd.read_csv(genelistcsv,header=None)
+    CT_genes['idx'] = CT_genes.index
+    CT_genes.columns = ['symbol', 'idx']
+    CT_genes = np.array(CT_genes['symbol'])
+
+    lr = joblib.load(open(model_pkl,'rb'))
+    lr.features = CT_genes
+    features = adata.var_names
+    k_x = features.isin(list(CT_genes))
+    print(f'{k_x.sum()} features used for prediction', file=sys.stderr)
+    k_x_idx = np.where(k_x)[0]
+    temp=adata
+    X = temp.X[:, k_x_idx]
+    features = features[k_x]
+    ad_ft = pd.DataFrame(features.values, columns=['ad_features']).reset_index().rename(columns={'index': 'ad_idx'})
+    lr_ft = pd.DataFrame(lr.features, columns=['lr_features']).reset_index().rename(columns={'index': 'lr_idx'})
+    lr_idx = lr_ft.merge(ad_ft, left_on='lr_features', right_on='ad_features').sort_values(by='ad_idx').lr_idx.values
+
+    lr.n_features_in_ = lr_idx.size
+    lr.features = lr.features[lr_idx]
+    lr.coef_ = lr.coef_[:, lr_idx]
+    predicted_hi = lr.predict(X)
+    adata.obs['predicted_hi'] = predicted_hi
+
+    return adata
