@@ -99,6 +99,20 @@ def ShiftEmbedding(adata,domain_key='batch',embedding='X_umap',ncols=3,alpha=0.9
     adata.obsm[embedding]=np.vstack((X.values,Y.values)).T
     return adata
 
+def CopyEmbedding(aFrom,aTo,embedding='X_umap'):
+    aFrom.obs['temp0']=aFrom.obsm[embedding][:,0]
+    aFrom.obs['temp1']=aFrom.obsm[embedding][:,1]
+    aTo.obs['temp0']=''
+    aTo.obs['temp1']=''
+    aTo.obs.loc[aFrom.obs_names,'temp0']=aFrom.obs['temp0']
+    aTo.obs.loc[aFrom.obs_names,'temp1']=aFrom.obs['temp1']
+    aTo.obsm[embedding]=np.vstack((aTo.obs['temp0'],aTo.obs['temp1'])).T
+    del aFrom.obs['temp0']
+    del aFrom.obs['temp1']
+    del aTo.obs['temp0']
+    del aTo.obs['temp1']
+    return aTo
+
 def CopyMeta(aFrom,aTo,overwrite=False):
     if overwrite==True:
         obs_items=aFrom.obs.columns
