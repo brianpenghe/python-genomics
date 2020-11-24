@@ -99,6 +99,15 @@ def ShiftEmbedding(adata,domain_key='batch',embedding='X_umap',ncols=3,alpha=0.9
     adata.obsm[embedding]=np.vstack((X.values,Y.values)).T
     return adata
 
+def CopyObs(aFrom,aTo,overwrite=False):
+    if overwrite==True:
+        obs_items=aFrom.obs.columns
+    else:
+        obs_items=aFrom.obs.columns[~aFrom.obs.columns.isin(aTo.obs.columns)]
+    aTo.obs[obs_items]=''
+    aTo.obs.loc[aFrom.obs_names,obs_items]=aFrom.obs.loc[:,obs_items]
+    return aTo
+
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str):
     if 'default' in celltypelist:
