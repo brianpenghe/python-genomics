@@ -174,14 +174,14 @@ def mtx2df(mtx,idx,col):
 
 def DEmarkers(adata,celltype,reference,obs,max_out_group_fraction=0.25,\
 use_raw=False,length=100,obslist=['percent_mito','n_counts','batch'],\
-min_fold_change=2,min_in_group_fraction=0.25,log=True):
+min_fold_change=2,min_in_group_fraction=0.25,log=True,method='wilcoxon'):
     celltype=celltype
     sc.tl.rank_genes_groups(adata, obs, groups=[celltype],
-                        reference=reference,method='wilcoxon',log=log)
+                        reference=reference,method=method,log=log)
     sc.tl.filter_rank_genes_groups(adata, groupby=obs,\
                     max_out_group_fraction=max_out_group_fraction,
                     min_fold_change=min_fold_change,use_raw=use_raw,
-                    min_in_group_fraction=0.25,log=log)
+                    min_in_group_fraction=min_in_group_fraction,log=log)
     GeneList=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names']).loc[:,celltype].dropna().head(length).transpose().tolist()
     sc.pl.umap(adata,color=GeneList+obslist,
            color_map = 'jet',use_raw=use_raw)
@@ -189,6 +189,17 @@ min_fold_change=2,min_in_group_fraction=0.25,log=True):
              groupby=obs,use_raw=use_raw)
     sc.pl.stacked_violin(adata[adata.obs[obs].isin([celltype,reference]),:],var_names=GeneList,groupby=obs,
            swap_axes=True)
+
+def GlobalMarkers(adata,obs,max_out_group_fraction=0.25,min_fold_change=2,\
+min_in_group_fraction=0.25,use_raw=False,method='wilcoxon'):
+    sc.tl.rank_genes_groups(adata,groupby=obs,n_genes=len(adata.var_names),
+                  method=method)
+    sc.tl.filter_rank_genes_groups(adata,groupby=obs,
+                    max_out_group_fraction=max_out_group_fraction,
+                    min_fold_change=min_fold_change,use_raw=use_raw,
+                    min_in_group_fraction=min_in_group_fraction)
+    Markers=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names'])
+    return Markers.apply(lambda x: pd.Series(x.dropna().values))
 
 def HVGbyBatch(adata,batch_key='batch',min_mean=0.0125, max_mean=3, min_disp=0.5):
     sc.settings.verbosity=0
