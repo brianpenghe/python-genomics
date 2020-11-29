@@ -360,10 +360,17 @@ def snsSplitViolin(adata,genelist,celltype='leiden',celltypelist=['0','1']):
 
 def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
-
-            robust=True,xticklabels=False,yticklabels=False,method='complete',metric='correlation',cmap='jet'):
+            robust=True,xticklabels=False,yticklabels=False,method='complete',metric='correlation',cmap='jet',\
+            downsampleTo=0):
     if 'default' in cellnames:
         cellnames = MouseC1data.obs_names
+        if ( downsampleTo > 0 ) & (isinstance(downsampleTo, int)):
+            NewIndex3=[]
+            for i in MouseC1data.obs[cell_type].sort_values().unique():
+                NewIndex3=NewIndex3+random.sample(\
+                          population=MouseC1data[MouseC1data.obs[cell_type]==i].obs_names.tolist(),
+                k=min(downsampleTo,len(MouseC1data[MouseC1data.obs[cell_type]==i].obs_names.tolist())))
+        cellnames=MouseC1data[NewIndex3].obs_names
     if 'default' in genenames:
         genenames = MouseC1data.var_names
     genenames = [i for i in genenames if i in MouseC1data.var_names]
