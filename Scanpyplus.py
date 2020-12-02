@@ -201,9 +201,10 @@ min_in_group_fraction=0.25,use_raw=False,method='wilcoxon'):
     Markers=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names'])
     return Markers.apply(lambda x: pd.Series(x.dropna().values))
 
-def HVGbyBatch(adata,batch_key='batch',min_mean=0.0125, max_mean=3, min_disp=0.5):
+def HVGbyBatch(adata,batch_key='batch',min_mean=0.0125, max_mean=3, min_disp=0.5,min_clustersize=100):
     sc.settings.verbosity=0
-    for key in adata.obs[batch_key].unique():
+    batchlist=adata.obs[batch_key].value_counts()
+    for key in batchlist[batchlist>min_clustersize].index:
         adata_sample = adata[adata.obs[batch_key]==key,:]
         print(key)
         sc.pp.highly_variable_genes(adata_sample, min_mean=min_mean, max_mean=max_mean, min_disp=min_disp)
@@ -212,7 +213,7 @@ def HVGbyBatch(adata,batch_key='batch',min_mean=0.0125, max_mean=3, min_disp=0.5
     sc.settings.verbosity=3
     adata.var['highly_variable_n']=0
     temp=adata.var['highly_variable_n'].astype('int32')
-    for key in adata.obs[batch_key].unique():
+    for key in batchlist[batchlist>min_clustersize].index:
         temp=temp+adata.var['highly_variable'+key].astype('int32')
     adata.var['highly_variable_n']=temp
     return adata
