@@ -477,8 +477,9 @@ def DeepTree(adata,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_varia
                            figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
     return [bdata,test,test1,test2]
 
-def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch']):
-    for key in adata.obs[batch_key].unique():
+def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch'],min_clustersize=100):
+    batchlist=adata.obs[batch_key].value_counts()
+    for key in batchlist[batchlist>min_clustersize].index:
         print(key)
         bdata=adata[:,adata.var['highly_variable'+key]][adata.obs[batch_key]==key,:]
         sc.pp.filter_genes(bdata,min_cells=3)
@@ -492,7 +493,7 @@ def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch']):
         sc.pl.umap(adata,color=obslist)
     adata.var['Deep_n']=0
     temp=adata.var['Deep_n'].astype('int32')
-    for key in adata.obs[batch_key].unique():
+    for key in batchlist[batchlist>min_clustersize].index:
         temp=temp+adata.var['Deep_'+key].astype('int32')
     adata.var['Deep_n']=temp
     return adata
