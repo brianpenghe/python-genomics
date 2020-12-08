@@ -161,6 +161,7 @@ def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',\
            color=colors[i],label=stagelist[i])
     plt.grid(b=False)
     plt.legend(stagelist,fontsize=fontsize,bbox_to_anchor=legend_pos)
+    plt.xticks(rotation=90)
 
 def mtx2df(mtx,idx,col):
     #mtx is the name/location of the matrix.mtx file
