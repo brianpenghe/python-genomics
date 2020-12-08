@@ -129,7 +129,7 @@ def CopyMeta(aFrom,aTo,overwrite=False):
 
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str,
-    fontsize='x-small',legend_pos=(1,0.5)):
+    fontsize='x-small',legend_pos=(1,0.5),savefig=None):
     if 'default' in celltypelist:
         celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
     if 'default' in stagelist:
@@ -143,11 +143,13 @@ def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlab
     plt.grid(b=False)
     if plotlabel:
         plt.legend(celltypelist,fontsize=fontsize,bbox_to_anchor=legend_pos)
+    if savefig is not None:
+        plt.savefig(savefig+'.pdf',bbox_inches='tight')
 
 def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',\
     #please remember to run pl.umap to assign colors
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str,
-    fontsize='x-small',legend_pos=(1,0.5)):
+    fontsize='x-small',legend_pos=(1,0.5),savefig=None):
     if 'default' in celltypelist:
         celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
     if 'default' in stagelist:
@@ -162,6 +164,8 @@ def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',\
     plt.grid(b=False)
     plt.legend(stagelist,fontsize=fontsize,bbox_to_anchor=legend_pos)
     plt.xticks(rotation=90)
+    if savefig is not None:
+        plt.savefig(savefig+'.pdf',bbox_inches='tight')
 
 def mtx2df(mtx,idx,col):
     #mtx is the name/location of the matrix.mtx file
