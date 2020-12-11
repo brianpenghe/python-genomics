@@ -49,7 +49,7 @@ def CalculateRaw(adata,scaling_factor=10000):
                   obs=adata.obs,var=adata.var)
 
 def OrthoTranslate(adata,oTable='/mnt/190308Hongbohindlimb/mouse/Mouse-Human orthologs.txt'):
-    OrthologTable = pd.read_table(oTable).dropna()
+    OrthologTable = pd.read_csv(oTable).dropna()
     MouseGenes=OrthologTable.loc[:,'Gene name'].drop_duplicates(keep=False)
     HumanGenes=OrthologTable.loc[:,'Human gene name'].drop_duplicates(keep=False)
     FilteredTable=OrthologTable.loc[((OrthologTable.loc[:,'Gene name'].isin(MouseGenes)) &\
