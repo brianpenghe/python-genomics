@@ -533,7 +533,7 @@ def DeepTree2(adata,method='complete',metric='correlation',cellnames=['default']
 
 from datetime import date
 def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidate = False,\
-    multi_class='multinomial',n_jobs=-1,max_iter=200,tol=1e-4):
+    multi_class='multinomial',n_jobs=-1,max_iter=1000,tol=1e-4):
     #This function doesn't do normalization or scaling
     #The logistic regression function returns the updated Query object with predicted info stored
     IntersectGenes = np.intersect1d(Reference.var_names,Query.var_names)
