@@ -494,6 +494,7 @@ def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch'],min_clustersize
         print(key)
         bdata=adata[:,adata.var['highly_variable'+key]][adata.obs[batch_key]==key,:]
         sc.pp.filter_genes(bdata,min_cells=3)
+        sc.pl.umap(bdata,color=obslist)
         [bdata,test, test1, test2]=DeepTree(bdata,
                         MouseC1ColorDict2={False:'#000000',True:'#00FFFF'},
                         cell_type=obslist,
@@ -501,7 +502,7 @@ def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch'],min_clustersize
                         genenames=adata[:,adata.var['highly_variable'+key]].var_names.tolist(),
                          row_cluster=True,col_cluster=True)
         adata.var['Deep_'+key]=pd.Series(adata.var_names,index=adata.var_names).isin((bdata)[:,bdata.var['Deep']].var_names)
-        sc.pl.umap(adata,color=obslist)
+#        sc.pl.umap(adata,color=obslist)
     adata.var['Deep_n']=0
     temp=adata.var['Deep_n'].astype('int32')
     for key in batchlist[batchlist>min_clustersize].index:
