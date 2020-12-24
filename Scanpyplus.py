@@ -212,7 +212,7 @@ min_in_group_fraction=0.25,use_raw=False,method='wilcoxon'):
 def HVGbyBatch(adata,batch_key='batch',min_mean=0.0125, max_mean=3, min_disp=0.5,\
 min_clustersize=100,genenames=['default']):
     if 'default' in genenames:
-        genenames = adata.obs_names
+        genenames = adata.var_names
     sc.settings.verbosity=0
     batchlist=adata.obs[batch_key].value_counts()
     for key in batchlist[batchlist>min_clustersize].index:
