@@ -46,7 +46,7 @@ def CalculateRaw(adata,scaling_factor=10000):
     #This function returns an integer-count object
     #The normalization constant is assumed to be 10000
     return anndata.AnnData(X=sparse.csr_matrix(np.rint(np.array(np.expm1(adata.X).todense().transpose())*(adata.obs['n_counts'].values).transpose() / scaling_factor).transpose()),\
-                  obs=adata.obs,var=adata.var)
+                  obs=adata.obs,var=adata.var,obsm=adata.obsm,varm=adata.varm)
 
 def OrthoTranslate(adata,oTable='/mnt/190308Hongbohindlimb/mouse/Mouse-Human orthologs.txt'):
     adata.var_names_make_unique(join='-')
