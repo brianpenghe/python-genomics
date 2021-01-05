@@ -39,7 +39,8 @@ def ExtractColor(adata,obsKey='louvain',keytype=int):
     return dict(zip(labels,colors))
 
 def GetRaw(adata_all):
-    return anndata.AnnData(X=adata_all.raw.X,obs=adata_all.obs,var=adata_all.raw.var)
+    return anndata.AnnData(X=adata_all.raw.X,obs=adata_all.obs,var=adata_all.raw.var,\
+obsm=adata_all.obsm)
 
 def CalculateRaw(adata,scaling_factor=10000):
     #The object must contain a log-transformed matrix
@@ -194,7 +195,7 @@ min_fold_change=2,min_in_group_fraction=0.25,log=True,method='wilcoxon'):
     sc.pl.umap(adata,color=GeneList+obslist,
            color_map = 'jet',use_raw=use_raw)
     sc.pl.dotplot(adata,var_names=GeneList,
-             groupby=obs,use_raw=use_raw)
+             groupby=obs,use_raw=use_raw,standard_scale='var')
     sc.pl.stacked_violin(adata[adata.obs[obs].isin([celltype,reference]),:],var_names=GeneList,groupby=obs,
            swap_axes=True)
 
@@ -537,7 +538,7 @@ def DeepTree2(adata,method='complete',metric='correlation',cellnames=['default']
 
 from datetime import date
 def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidate = False,\
-    multi_class='multinomial',n_jobs=-1,max_iter=1000,tol=1e-4):
+    multi_class='multinomial',n_jobs=-1,max_iter=1000,tol=1e-4,keyword=''):
     #This function doesn't do normalization or scaling
     #The logistic regression function returns the updated Query object with predicted info stored
     IntersectGenes = np.intersect1d(Reference.var_names,Query.var_names)
@@ -563,8 +564,8 @@ def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidat
     if DoValidate is True:
         scores = cross_val_score(logit, X, y, cv=cv)
         print(scores)
-    _ = joblib.dump(result,str(today)+'Sklearn.result.joblib.pkl',compress=9)
-    np.savetxt(str(today)+'Sklearn.result.csv',IntersectGenes,fmt='%s',delimiter=',')
+    _ = joblib.dump(result,str(today)+'Sklearn.result.'+keyword+'.pkl',compress=9)
+    np.savetxt(str(today)+'Sklearn.result.'+keyword+'.csv',IntersectGenes,fmt='%s',delimiter=',')
     Query.obs['Predicted'] = y_predict
     return Query
 
