@@ -541,6 +541,8 @@ def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidat
     multi_class='multinomial',n_jobs=-1,max_iter=1000,tol=1e-4,keyword=''):
     #This function doesn't do normalization or scaling
     #The logistic regression function returns the updated Query object with predicted info stored
+    Reference.var_names_make_unique()
+    Query.var_names_make_unique()
     IntersectGenes = np.intersect1d(Reference.var_names,Query.var_names)
     Reference2 = Reference[:,IntersectGenes]
     Query2 = Query[:,IntersectGenes]
