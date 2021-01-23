@@ -371,6 +371,17 @@ def snsSplitViolin(adata,genelist,celltype='leiden',celltypelist=['0','1']):
     sns.violinplot(data=df, x='gene', y='value', hue=celltype,
                 split=True, inner="quart", linewidth=1)
 
+def DownSample(MouseC1data,cell_type='leiden',downsampleTo=10):
+    NewIndex3=[]
+    if ( downsampleTo > 0 ) & (isinstance(downsampleTo, int)):
+        for i in MouseC1data.obs[cell_type].sort_values().unique():
+            NewIndex3=NewIndex3+random.sample(\
+                   population=MouseC1data[MouseC1data.obs[cell_type]==i].obs_names.tolist(),
+            k=min(downsampleTo,len(MouseC1data[MouseC1data.obs[cell_type]==i\
+                         ].obs_names.tolist())))
+    return MouseC1data[NewIndex3]
+
+
 def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
             robust=True,xticklabels=False,yticklabels=False,method='complete',metric='correlation',cmap='jet',\
@@ -381,8 +392,10 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
             NewIndex3=[]
             for i in MouseC1data.obs[cell_type].sort_values().unique():
                 NewIndex3=NewIndex3+random.sample(\
-                          population=MouseC1data[MouseC1data.obs[cell_type]==i].obs_names.tolist(),
-                k=min(downsampleTo,len(MouseC1data[MouseC1data.obs[cell_type]==i].obs_names.tolist())))
+                          population=MouseC1data[MouseC1data.obs[cell_type]==i\
+                                 ].obs_names.tolist(),
+                k=min(downsampleTo,len(MouseC1data[MouseC1data.obs[cell_type]==i\
+                                 ].obs_names.tolist())))
         cellnames=MouseC1data[NewIndex3].obs_names
     if 'default' in genenames:
         genenames = MouseC1data.var_names
