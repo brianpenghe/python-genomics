@@ -77,6 +77,8 @@ def Scanpy2MM(adata,prefix='temp'):
     #please make sure the object contains raw counts (using our CalculateRaw function)
     adata.var['feature_types']='Gene Expression'
     scipy.io.mmwrite(prefix+'matrix.mtx',adata.X.transpose(),field='integer')
+    if 'gene_ids' not in adata.var.columns.unique():
+        adata.var['gene_ids']=adata.var_names
     adata.var[['gene_ids','feature_types']].reset_index().set_index(keys='gene_ids').to_csv(prefix+"features.tsv", \
             sep = "\t", index= True,header=False)
     adata.obs.to_csv(prefix+"barcodes.tsv", sep = "\t", columns=[],header= False)
