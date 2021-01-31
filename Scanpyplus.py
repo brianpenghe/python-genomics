@@ -100,9 +100,11 @@ def ShiftEmbedding(adata,domain_key='batch',embedding='X_umap',ncols=3,alpha=0.9
     for i in list(range(len(batch_categories))):
         temp=adata[adata.obs.big_cluster==batch_categories[i]].obsm[embedding]
         scaler.fit(temp)
-        X.loc[adata.obs.big_cluster==batch_categories[i]]=(scaler.transform(temp)*alpha+ [i/ncols,i%ncols])[:,0]
+        X.loc[adata.obs.big_cluster==batch_categories[i]]=(scaler.transform(temp)*alpha+ [int(i/ncols),i%ncols])[:,0]
         Y.loc[adata.obs.big_cluster==batch_categories[i]]=(scaler.transform(temp)*alpha+ [i/ncols,i%ncols])[:,1]
     adata.obsm[embedding]=np.vstack((X.values,Y.values)).T
+    del adata.obs[embedding+'0']
+    del adata.obs[embedding+'1']
     return adata
 
 def CopyEmbedding(aFrom,aTo,embedding='X_umap'):
