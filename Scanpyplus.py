@@ -401,7 +401,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='high
                                  ].obs_names.tolist(),
                 k=min(downsampleTo,len(MouseC1data[MouseC1data.obs[cell_type]==i\
                                  ].obs_names.tolist())))
-        cellnames=MouseC1data[NewIndex3].obs_names
+            cellnames=MouseC1data[NewIndex3].obs_names
     if 'default' in genenames:
         genenames = MouseC1data.var_names
     genenames = [i for i in genenames if i in MouseC1data.var_names]
