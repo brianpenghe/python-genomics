@@ -387,7 +387,7 @@ def DownSample(MouseC1data,cell_type='leiden',downsampleTo=10):
     return MouseC1data[NewIndex3]
 
 
-def snsCluster(MouseC1data,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
+def snsCluster(MouseC1data,MouseC1ColorDict2={False:'#000000',True:'#00FFFF'},cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
             robust=True,xticklabels=False,yticklabels=False,method='complete',metric='correlation',cmap='jet',\
             downsampleTo=0):
