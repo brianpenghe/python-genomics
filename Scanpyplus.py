@@ -50,7 +50,7 @@ def CalculateRaw(adata,scaling_factor=10000):
                   obs=adata.obs,var=adata.var,obsm=adata.obsm,varm=adata.varm)
 
 def OrthoTranslate(adata,\
-oTable='/mnt/190308Hongbohindlimb/mouse/Mouse-Human_orthologs_only.csv'):
+oTable='~/refseq/Mouse-Human_orthologs_only.csv'):
     adata.var_names_make_unique(join='-')
     OrthologTable = pd.read_csv(oTable).dropna()
     MouseGenes=OrthologTable.loc[:,'Gene name'].drop_duplicates(keep=False)
@@ -386,7 +386,6 @@ def DownSample(MouseC1data,cell_type='leiden',downsampleTo=10):
                          ].obs_names.tolist())))
     return MouseC1data[NewIndex3]
 
-
 def snsCluster(MouseC1data,MouseC1ColorDict2={False:'#000000',True:'#00FFFF'},cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=False,col_cluster=False,\
             robust=True,xticklabels=False,yticklabels=False,method='complete',metric='correlation',cmap='jet',\
@@ -469,11 +468,15 @@ def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=f
     print(Main_cell_types)
     for key in Main_cell_types:
         temp=MouseC1data[MouseC1data.obs[cell_type]==key].to_df()
+        tempbool=temp.astype(bool)
         temp[cell_type]=key
+        tempbool[cell_type]=key
         if metric=='mean':
             temp2 = temp.groupby(by=cell_type).mean()
         elif metric=='median':
             temp2 = temp.groupby(by=cell_type).median()
+        elif metric=='fraction':
+            temp2 = tempbool.groupby(by=cell_type).sum()/tempbool.groupby(by=cell_type).count()
         del temp
         MousePseudoBulk.loc[:,key]=temp2.loc[key,:].transpose()
         del temp2
@@ -485,7 +488,7 @@ def DeepTree(adata,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_varia
     if 'default' in cellnames:
         cellnames = adata.obs_names
     if 'default' in genenames:
-        genenames = adata.var_names    
+        genenames = adata.var_names
     test=snsCluster(adata,\
                            MouseC1ColorDict2=MouseC1ColorDict2,\
                            genenames=genenames, cellnames=cellnames,\
