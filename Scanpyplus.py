@@ -203,6 +203,7 @@ min_fold_change=2,min_in_group_fraction=0.25,log=True,method='wilcoxon'):
              groupby=obs,use_raw=use_raw,standard_scale='var')
     sc.pl.stacked_violin(adata[adata.obs[obs].isin([celltype,reference]),:],var_names=GeneList,groupby=obs,
            swap_axes=True)
+    return GeneList
 
 def GlobalMarkers(adata,obs,max_out_group_fraction=0.25,min_fold_change=2,\
 min_in_group_fraction=0.25,use_raw=False,method='wilcoxon'):
