@@ -596,7 +596,6 @@ def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidat
 def LogisticPrediction(adata,model_pkl,genelistcsv):
     #This function imports saved logistic model and gene list csv to predict cell types for adata
     #adata has better been scaled if you trained a model using scaled AnnData
-    import joblib
     CT_genes=pd.read_csv(genelistcsv,header=None)
     CT_genes['idx'] = CT_genes.index
     CT_genes.columns = ['symbol', 'idx']
