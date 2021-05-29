@@ -70,3 +70,18 @@ def Ginni(beta):
     beta.loc['Ginni']=[np.abs(np.subtract.outer(beta.loc[:,i].values,\
                beta.loc[:,i].values)).mean()/np.mean(beta.loc[:,i].values)*0.5 for i in beta.columns]
     return beta
+
+def cellphonedb_p2adjMat(cpdb_p_loc='pvalues.txt',pval=0.05):
+    #this function reads the p_value file from cellphonedb output and generates a matrix file 
+    #with significant pairs only
+    cpdb_p=pd.read_csv(cpdb_p_loc,sep='\t')
+    cellpairs=pd.Series(cpdb_p.iloc[0,11:].index).str.split('|',expand=True)
+    cell0=cellpairs.loc[:,0].unique()
+    cell1=cellpairs.loc[:,1].unique()
+    InterMat=pd.DataFrame('',index=cell0,columns=cell1)
+    for i in cell0:
+        for j in cell1:
+            InterMat.loc[i,j]= '|'.join(cpdb_p.loc[cpdb_p.loc[:,i+'|'+j]<pval,
+                                               'interacting_pair'].tolist())
+    InterMat.to_csv(cpdb_p_loc+'.pairs'+str(pval)+'.csv')
+    return InterMat
