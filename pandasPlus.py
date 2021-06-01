@@ -85,3 +85,16 @@ def cellphonedb_p2adjMat(cpdb_p_loc='pvalues.txt',pval=0.05):
                                                'interacting_pair'].tolist())
     InterMat.to_csv(cpdb_p_loc+'.pairs'+str(pval)+'.csv')
     return InterMat
+
+def cellphonedb_mat_per_interaction(interacting_pair,cpdb_p_loc='pvalues.txt'):
+    #this function returns a matrix of celltype-celltype interaction p-values for a specific interaction-pair
+    cpdb_p=pd.read_csv(cpdb_p_loc,sep='\t')
+    cellpairs=pd.Series(cpdb_p.iloc[0,11:].index).str.split('|',expand=True)
+    cell0=cellpairs.loc[:,0].unique()
+    cell1=cellpairs.loc[:,1].unique()
+    InterMat=pd.DataFrame(0,index=cell0,columns=cell1)
+    for i in cell0:
+        for j in cell1:
+            InterMat.loc[i,j]= cpdb_p.loc[cpdb_p.loc[:,'interacting_pair'].isin([interacting_pair]),i+'|'+j].values
+    InterMat.to_csv(cpdb_p_loc+'.pairs'+interacting_pair+'.csv')
+    return InterMat
