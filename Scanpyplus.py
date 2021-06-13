@@ -38,6 +38,13 @@ def ExtractColor(adata,obsKey='louvain',keytype=int):
     colors=list(adata.uns[obsKey+'_colors'])
     return dict(zip(labels,colors))
 
+def UpdateUnsColor(adata,ColorDict,obsKey='louvain'):
+    #ColorDict is like {'Secretory 3 C1': '#c0c0c5','Secretory 4 C1': '#87ceee'}
+    ColorUns=ExtractColor(adata,obsKey,keytype=str)
+    ColorUns.update(ColorDict)
+    adata.uns[obsKey+'_colors']=list(ColorUns.values())
+    return adata
+
 def GetRaw(adata_all):
     return anndata.AnnData(X=adata_all.raw.X,obs=adata_all.obs,var=adata_all.raw.var,\
 obsm=adata_all.obsm)
