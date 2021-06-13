@@ -149,12 +149,12 @@ def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlab
         celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
     if 'default' in stagelist:
         stagelist = sorted(adata.obs[stagekey].unique().tolist(),key=stagekeytype)
-    colors=list(adata.uns[celltypekey+'_colors'])
+    colors=ExtractColor(adata,celltypekey,keytype=str)
     count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]).loc[celltypelist,stagelist])
     count_ratio_array=count_array / np.sum(count_array,axis=0)
     for i in range(len(celltypelist)):
          plt.barh(stagelist[::-1],count_ratio_array[i,::-1],
-            left=np.sum(count_ratio_array[0:i,::-1],axis=0),color=colors[i],label=celltypelist[i])
+            left=np.sum(count_ratio_array[0:i,::-1],axis=0),color=colors[celltypelist[i]],label=celltypelist[i])
     plt.grid(b=False)
     if plotlabel:
         plt.legend(celltypelist,fontsize=fontsize,bbox_to_anchor=legend_pos)
@@ -170,13 +170,13 @@ def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',plotlab
         celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
     if 'default' in stagelist:
         stagelist = sorted(adata.obs[stagekey].unique().tolist(),key=stagekeytype)
-    colors=list(adata.uns[stagekey+'_colors'])
+    colors=ExtractColor(adata,stagekey,keytype=str)
     count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]).loc[celltypelist,stagelist])
     count_ratio_array=count_array.transpose() / np.sum(count_array,axis=1)
     for i in range(len(stagelist)):
         plt.bar(celltypelist,count_ratio_array[i,:],
             bottom=1-np.sum(count_ratio_array[0:i+1,:],axis=0),
-           color=colors[i],label=stagelist[i])
+           color=colors[stagelist[i]],label=stagelist[i])
     plt.grid(b=False)
     plt.legend(stagelist,fontsize=fontsize,bbox_to_anchor=legend_pos)
     plt.xticks(rotation=90)
