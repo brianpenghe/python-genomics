@@ -149,6 +149,8 @@ def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlab
         celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
     if 'default' in stagelist:
         stagelist = sorted(adata.obs[stagekey].unique().tolist(),key=stagekeytype)
+    celltypelist=[i for i in celltypelist if i in adata.obs[celltypekey].unique()]
+    stagelist=[i for i in stagelist if i in adata.obs[stagekey].unique()]
     colors=ExtractColor(adata,celltypekey,keytype=str)
     count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]).loc[celltypelist,stagelist])
     count_ratio_array=count_array / np.sum(count_array,axis=0)
@@ -170,6 +172,8 @@ def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',plotlab
         celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
     if 'default' in stagelist:
         stagelist = sorted(adata.obs[stagekey].unique().tolist(),key=stagekeytype)
+    celltypelist=[i for i in celltypelist if i in adata.obs[celltypekey].unique()]
+    stagelist=[i for i in stagelist if i in adata.obs[stagekey].unique()]
     colors=ExtractColor(adata,stagekey,keytype=str)
     count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]).loc[celltypelist,stagelist])
     count_ratio_array=count_array.transpose() / np.sum(count_array,axis=1)
