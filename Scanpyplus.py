@@ -143,7 +143,7 @@ def CopyMeta(aFrom,aTo,overwrite=False):
 
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str,
-    fontsize='x-small',legend_pos=(1,0.5),savefig=None):
+    fontsize='x-small',yfontsize='x-small',legend_pos=(1,0.5),savefig=None):
     # this is a function for horizonal bar plots
     if 'default' in celltypelist:
         celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
@@ -155,8 +155,9 @@ def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlab
     count_array=np.array(pd.crosstab(adata.obs[celltypekey],adata.obs[stagekey]).loc[celltypelist,stagelist])
     count_ratio_array=count_array / np.sum(count_array,axis=0)
     for i in range(len(celltypelist)):
-         plt.barh(stagelist[::-1],count_ratio_array[i,::-1],
+        plt.barh(stagelist[::-1],count_ratio_array[i,::-1],
             left=np.sum(count_ratio_array[0:i,::-1],axis=0),color=colors[celltypelist[i]],label=celltypelist[i])
+        plt.yticks(fontsize=yfontsize)
     plt.grid(b=False)
     if plotlabel:
         plt.legend(celltypelist,fontsize=fontsize,bbox_to_anchor=legend_pos)
@@ -167,7 +168,7 @@ def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',plotlab
     # this is a function for vertical bar plots
     # please remember to run pl.umap to assign colors
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str,
-    fontsize='x-small',legend_pos=(1,0.5),savefig=None):
+    fontsize='x-small',xfontsize='x-small',legend_pos=(1,0.5),savefig=None):
     if 'default' in celltypelist:
         celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
     if 'default' in stagelist:
@@ -181,6 +182,7 @@ def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',plotlab
         plt.bar(celltypelist,count_ratio_array[i,:],
             bottom=1-np.sum(count_ratio_array[0:i+1,:],axis=0),
            color=colors[stagelist[i]],label=stagelist[i])
+        plt.xticks(fontsize=xfontsize)
     plt.grid(b=False)
     plt.legend(stagelist,fontsize=fontsize,bbox_to_anchor=legend_pos)
     plt.xticks(rotation=90)
