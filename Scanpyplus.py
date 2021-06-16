@@ -636,3 +636,50 @@ def LogisticPrediction(adata,model_pkl,genelistcsv):
     adata.obs['predicted_hi'] = predicted_hi
 
     return adata
+
+def DoubletClusters(adata,hi_type,lo_type,rm_genes=[],print_marker_genes=False):
+    DoubletScores=pd.DataFrame(0,index=adata.obs['new_celltype'].unique(),
+                          columns=['Parent1','Parent2','Parent1_count','Parent2_count','All_count','p_value'])
+    #hi_type='leiden_R' is the key for high-resolution cell types that main include doublet clusters
+    #lo_type='leiden' is the key for low-resolution cell types that represent compartments
+    #this function aims to identify cross-compartment doublet clusters. Same-compartment doublet clusters 
+    # look more like transitional cell types closer to homotypic doublets which are difficult to catch
+    #rm_genes=['TYMS','MKI67'] is a list of genes you don't want to include, such as cell-cycle genes
+    import time
+    import scipy.stats as ss
+    start_time = time.time()
+    alpha=adata.obs[lo_type].value_counts()
+    for j in adata.obs[lo_type].sort_values().unique():
+        temp=adata[adata.obs[lo_type]==j][:,~adata.var_names.isin(rm_genes)]
+        if len(temp.obs[hi_type].value_counts())==1:
+            continue
+        sc.tl.rank_genes_groups(temp,groupby=hi_type,n_genes=50)
+        Markers=pd.DataFrame(temp.uns['rank_genes_groups']['names'])
+        for i in pd.DataFrame(temp.uns['rank_genes_groups']['names']).columns:
+            scoring_genes=Markers.loc[~(Markers.loc[:,i].isin(rm_genes)),i]
+            if print_marker_genes:
+                print(scoring_genes)
+            if len(scoring_genes)<20:
+                continue
+            sc.tl.score_genes(adata,gene_list=scoring_genes,score_name=i+'_score')
+            DoubletScores.loc[i,'Parent1']=adata[adata.obs[hi_type]==i\
+                        ].obs[lo_type].value_counts().index[0]
+            cutoff=adata[adata.obs.new_celltype==i].obs[i+'_score'].quantile(q=0.75)
+
+            beta=adata.obs.loc[adata.obs.loc[:,i+'_score'\
+                    ]>cutoff,lo_type].value_counts()
+            DoubletScores.loc[i,'Parent2']=beta.index[0]
+#        if DoubletScores.loc[i,'Parent1']==DoubletScores.loc[i,'Parent2']:
+#            pass
+#        else:
+            DoubletScores.loc[i,'Parent2_count']=beta[0]
+            DoubletScores.loc[i,'Parent1_count']=beta.loc[DoubletScores.loc[i,'Parent1']]
+            DoubletScores.loc[i,'All_count']=beta.sum()
+            hpd=ss.hypergeom(alpha.sum()-alpha.loc[DoubletScores.loc[i,'Parent1']],
+                         alpha.loc[DoubletScores.loc[i,'Parent2']],
+                        beta.sum()-beta.loc[DoubletScores.loc[i,'Parent1']])
+            DoubletScores.loc[i,'p_value']=hpd.pmf(DoubletScores.loc[i,'Parent2_count'])
+    print("--- %s seconds ---" % (time.time() - start_time))
+    DoubletScores.loc[:,'Is_doublet_cluster']=(DoubletScores.loc[:,'Parent2_count'] / DoubletScores.loc[:,'All_count'] > 0.6) & \
+~(DoubletScores.loc[:,'Parent1'] == DoubletScores.loc[:,'Parent2'])
+    return DoubletScores
