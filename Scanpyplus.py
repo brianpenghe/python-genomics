@@ -34,8 +34,9 @@ from upsetplot import plot
 import gzip
 
 def ExtractColor(adata,obsKey='louvain',keytype=int):
-    labels=sorted(adata.obs[obsKey].unique().to_list(),key=keytype)
-    colors=list(adata.uns[obsKey+'_colors'])
+#   labels=sorted(adata.obs[obsKey].unique().to_list(),key=keytype)
+    labels=adata.obs[obsKey].cat.categories
+    colors=adata.uns[obsKey+'_colors']
     return dict(zip(labels,colors))
 
 def UpdateUnsColor(adata,ColorDict,obsKey='louvain'):
