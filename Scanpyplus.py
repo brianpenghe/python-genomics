@@ -142,6 +142,13 @@ def CopyMeta(aFrom,aTo,overwrite=False):
     aTo.var.loc[aFrom.var_names,var_items]=aFrom.var.loc[:,var_items]
     return aTo
 
+def AddMeta(adata,meta_df):
+    temp=adata.copy()
+    temp=temp[meta_df.index]
+    for i in meta_df.columns:
+        temp.obs[i]=meta_df.loc[temp.obs_names,i]
+    return temp
+
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str,
     fontsize='x-small',yfontsize='x-small',legend_pos=(1,0.5),savefig=None):
