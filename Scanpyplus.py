@@ -1,8 +1,7 @@
 import gc
-import scrublet as scr
+#import scrublet as scr
 import scipy.io
 from scipy import sparse
-import scvelo as scv
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 import seaborn as sns
@@ -17,8 +16,6 @@ from sklearn.model_selection import cross_val_score, StratifiedKFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfTransformer
 import joblib
-from pysankey.sankey import sankey
-#not that it used to be called pySankey with uppercase "s"
 
 import numpy as np
 import pandas as pd
@@ -260,6 +257,7 @@ min_clustersize=100,genenames=['default']):
     return adata
 
 def Bertie(adata,Resln=1,batch_key='batch'):
+    import scrublet as scr
     scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
     adata.obs['doublet_scores']=0
     def bh(pvalues):
@@ -334,6 +332,7 @@ def Bertie(adata,Resln=1,batch_key='batch'):
     return adata
 
 def Bertie_preclustered(adata,batch_key='batch',cluster_key='louvain'):
+    import scrublet as scr
     scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
     adata.obs['doublet_scores']=0
     def bh(pvalues):
