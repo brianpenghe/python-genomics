@@ -17,7 +17,6 @@ from sklearn.model_selection import cross_val_score, StratifiedKFold
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import TfidfTransformer
 import joblib
-from pysankey.sankey import sankey
 #not that it used to be called pySankey with uppercase "s"
 import scipy.stats
 import numpy as np
@@ -29,7 +28,6 @@ import os
 from scipy import sparse
 from scipy import cluster
 from glob import iglob
-from upsetplot import UpSet
 
 def show_graph_with_labels(adjacency_matrix):
     rows, cols = np.where(adjacency_matrix.values >= 0.9)
@@ -47,6 +45,7 @@ def DF2Ann(DF):
     return(anndata.AnnData(DF))
 
 def UpSetFromLists(listOflist,labels,size_height=3,showplot=True):
+    from upsetplot import UpSet
     listall=list(set([j for i in listOflist for j in i]))
     temp=pd.Series(listall,index=listall)
     temp2=pd.concat([temp.isin(i) for i in listOflist+[temp]],axis=1)
