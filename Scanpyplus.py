@@ -21,13 +21,10 @@ import numpy as np
 import pandas as pd
 import scanpy as sc
 import anndata
-import bbknn
 import os
 from scipy import sparse
 from scipy import cluster
 from glob import iglob
-from upsetplot import UpSet
-from upsetplot import plot
 import gzip
 
 def ExtractColor(adata,obsKey='louvain',keytype=int):
@@ -556,6 +553,8 @@ def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch'],min_clustersize
     return adata
 
 def Venn_Upset(adata,genelists,size_height=3):
+    from upsetplot import UpSet
+    from upsetplot import plot
     #gene lists can be ['Deep_1','Deep_2']
     deepgenes=pd.DataFrame(adata.var[genelists+['highly_variable']])
     deepgenes=deepgenes.set_index(genelists)
