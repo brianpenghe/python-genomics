@@ -41,8 +41,10 @@ def UpdateUnsColor(adata,ColorDict,obsKey='louvain'):
     return adata
 
 def GetRaw(adata_all):
-    return anndata.AnnData(X=adata_all.raw.X,obs=adata_all.obs,var=adata_all.raw.var,\
-obsm=adata_all.obsm)
+    adata=anndata.AnnData(X=adata_all.raw.X,obs=adata_all.obs,var=adata_all.raw.var,\
+obsm=adata_all.obsm,uns=adata_all.uns,obsp=adata_all.obsp)
+    adata.raw=adata
+    return adata
 
 def CalculateRaw(adata,scaling_factor=10000):
     #The object must contain a log-transformed matrix
