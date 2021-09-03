@@ -203,19 +203,69 @@ def mtx2df(mtx,idx,col):
     sc_count = pd.DataFrame(data=count.toarray(),
                         index=idxs,
                         columns=cols)
-    return sc_count 
+    return sc_count
+
+def returnDEres(adata, column = None, key= None, remove_mito_ribo = True):
+    import functools
+    if key is None:
+        key = 'rank_genes_groups'
+    else:
+        key = key
+
+    if column is None:
+        column = list(adata.uns[key]['scores'].dtype.fields.keys())[0]
+    else:
+        column = column
+
+    scores = pd.DataFrame(data = adata.uns[key]['scores'][column], index = adata.uns[key]['names'][column])
+    lfc = pd.DataFrame(data = adata.uns[key]['logfoldchanges'][column], index = adata.uns[key]['names'][column])
+    pvals = pd.DataFrame(data = adata.uns[key]['pvals'][column], index = adata.uns[key]['names'][column])
+    padj = pd.DataFrame(data = adata.uns[key]['pvals_adj'][column], index = adata.uns[key]['names'][column])
+    try:
+        pts = pd.DataFrame(data = adata.uns[key]['pts'][column], index = adata.uns[key]['names'][column])       
+    except:
+        pass
+    scores = scores.loc[scores.index.dropna()]
+    lfc = lfc.loc[lfc.index.dropna()]
+    pvals = pvals.loc[pvals.index.dropna()]
+    padj = padj.loc[padj.index.dropna()]
+    try:
+        pts = pts.loc[pts.index.dropna()]
+    except:
+        pass
+    try:
+        dfs = [scores, lfc, pvals, padj, pts]
+    except:
+        dfs = [scores, lfc, pvals, padj]
+    df_final = functools.reduce(lambda left, right: pd.merge(left, right, left_index = True, right_index = True), dfs)
+    try:
+        df_final.columns = ['scores', 'logfoldchanges', 'pvals', 'pvals_adj', 'pts']
+    except:
+        df_final.columns = ['scores', 'logfoldchanges', 'pvals', 'pvals_adj']
+    if remove_mito_ribo:
+        df_final = df_final[~df_final.index.isin(list(df_final.filter(regex='^RPL|^RPS|^MRPS|^MRPL|^MT-', axis = 0).index))]
+        df_final = df_final[~df_final.index.isin(list(df_final.filter(regex='^Rpl|^Rps|^Mrps|^Mrpl|^mt-', axis = 0).index))]
+    return(df_final)
 
 def DEmarkers(adata,celltype,reference,obs,max_out_group_fraction=0.25,\
 use_raw=False,length=100,obslist=['percent_mito','n_counts','batch'],\
 min_fold_change=2,min_in_group_fraction=0.25,log=True,method='wilcoxon'):
     celltype=celltype
     sc.tl.rank_genes_groups(adata, obs, groups=[celltype],
-                        reference=reference,method=method,log=log)
-    sc.tl.filter_rank_genes_groups(adata, groupby=obs,\
-                    max_out_group_fraction=max_out_group_fraction,
-                    min_fold_change=min_fold_change,use_raw=use_raw,
-                    min_in_group_fraction=min_in_group_fraction,log=log)
-    GeneList=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names']).loc[:,celltype].dropna().head(length).transpose().tolist()
+                        reference=reference,method=method,log=log,pts=True)
+    temp=returnDEres(adata,key='rank_genes_groups',column=celltype)
+#    sc.tl.filter_rank_genes_groups(adata, groupby=obs,\
+#                    max_out_group_fraction=max_out_group_fraction,
+#                    min_fold_change=min_fold_change,use_raw=use_raw,
+#                    min_in_group_fraction=min_in_group_fraction,log=log)
+#    GeneList=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names']).loc[:,celltype].dropna().head(length).transpose().tolist()
+    temp1=pd.concat([temp,
+        (adata[:,temp.index][adata.obs[obs]==celltype].to_df()>0).mean(axis=0).rename('pct1'),
+        (adata[:,temp.index][adata.obs[obs]==reference].to_df()>0).mean(axis=0).rename('pct2')],
+        axis=1)
+    import math
+    GeneList=temp1.loc[(temp1.pvals < 0.05) & (temp1.pct1 >= min_in_group_fraction) & \
+(temp1.logfoldchanges > math.log(min_fold_change)) & (temp1.pct2 <= max_out_group_fraction),:].index.tolist()
     sc.pl.umap(adata,color=GeneList+obslist,
            color_map = 'jet',use_raw=use_raw)
     sc.pl.dotplot(adata,var_names=GeneList,
