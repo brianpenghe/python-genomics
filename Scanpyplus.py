@@ -249,7 +249,8 @@ def returnDEres(adata, column = None, key= None, remove_mito_ribo = True):
 
 def DEmarkers(adata,celltype,reference,obs,max_out_group_fraction=0.25,\
 use_raw=False,length=100,obslist=['percent_mito','n_counts','batch'],\
-min_fold_change=2,min_in_group_fraction=0.25,log=True,method='wilcoxon'):
+min_fold_change=2,min_in_group_fraction=0.25,log=True,method='wilcoxon',
+embedding='X_umap'):
     celltype=celltype
     sc.tl.rank_genes_groups(adata, obs, groups=[celltype],
                         reference=reference,method=method,log=log,pts=True)
@@ -266,7 +267,7 @@ min_fold_change=2,min_in_group_fraction=0.25,log=True,method='wilcoxon'):
     import math
     GeneList=temp1.loc[(temp1.pvals < 0.05) & (temp1.pct1 >= min_in_group_fraction) & \
 (temp1.logfoldchanges > math.log(min_fold_change)) & (temp1.pct2 <= max_out_group_fraction),:].index.tolist()
-    sc.pl.umap(adata,color=GeneList+obslist,
+    sc.pl.embedding(adata,basis=embedding,color=GeneList+obslist,
            color_map = 'jet',use_raw=use_raw)
     sc.pl.dotplot(adata,var_names=GeneList,
              groupby=obs,use_raw=use_raw,standard_scale='var')
