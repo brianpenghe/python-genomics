@@ -93,7 +93,7 @@ def Scanpy2MM(adata,prefix='temp'):
     ##file2gz(prefix+"metadata.tsv")
     file2gz(prefix+"features.tsv")
 
-def ShiftEmbedding(adata,domain_key='batch',embedding='X_umap',ncols=3,alpha=0.9):
+def ShiftEmbedding(adata,domain_key='batch',embedding='X_umap',nrows=3,alpha=0.9):
     from sklearn import preprocessing
     scaler = preprocessing.MinMaxScaler()
     adata.obs[embedding+'0']=adata.obsm[embedding][:,0]
@@ -104,8 +104,8 @@ def ShiftEmbedding(adata,domain_key='batch',embedding='X_umap',ncols=3,alpha=0.9
     for i in list(range(len(batch_categories))):
         temp=adata[adata.obs[domain_key]==batch_categories[i]].obsm[embedding]
         scaler.fit(temp)
-        X.loc[adata.obs[domain_key]==batch_categories[i]]=(scaler.transform(temp)*alpha+ [int(i/ncols),i%ncols])[:,0]
-        Y.loc[adata.obs[domain_key]==batch_categories[i]]=(scaler.transform(temp)*alpha+ [i/ncols,i%ncols])[:,1]
+        X.loc[adata.obs[domain_key]==batch_categories[i]]=(scaler.transform(temp)*alpha+ [int(i/nrows),i%nrows])[:,0]
+        Y.loc[adata.obs[domain_key]==batch_categories[i]]=(scaler.transform(temp)*alpha+ [i/nrows,i%nrows])[:,1]
     adata.obsm[embedding]=np.vstack((X.values,Y.values)).T
     del adata.obs[embedding+'0']
     del adata.obs[embedding+'1']
