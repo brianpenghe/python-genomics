@@ -40,6 +40,12 @@ def UpdateUnsColor(adata,ColorDict,obsKey='louvain'):
     adata.uns[obsKey+'_colors']=list(ColorUns.values())
     return adata
 
+def MakeWhite(adata,obsKey='louvain',whiteCat='nan',type=str):
+    temp=ExtractColor(adata,obsKey,type)
+    temp[whiteCat]='#FFFFFF'
+    UpdateUnsColor(adata,temp,obsKey)
+    return adata
+
 def GetRaw(adata_all):
     adata=anndata.AnnData(X=adata_all.raw.X,obs=adata_all.obs,var=adata_all.raw.var,\
 obsm=adata_all.obsm,uns=adata_all.uns,obsp=adata_all.obsp)
