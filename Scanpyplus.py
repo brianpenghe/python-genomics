@@ -83,7 +83,7 @@ def file2gz(file,delete_original=True):
     if delete_original==True:
         os.remove(file)
 
-def Scanpy2MM(adata,prefix='temp'):
+def Scanpy2MM(adata,prefix='temp',write2Dobsm=['No']):
     #Scanpy2MM(adata,"./")
     #please make sure the object contains raw counts (using our CalculateRaw function)
     adata.var['feature_types']='Gene Expression'
@@ -92,8 +92,17 @@ def Scanpy2MM(adata,prefix='temp'):
         adata.var['gene_ids']=adata.var_names
     adata.var[['gene_ids','feature_types']].reset_index().set_index(keys='gene_ids').to_csv(prefix+"features.tsv", \
             sep = "\t", index= True,header=False)
+    if 'No' in write2Dobsm:
+        print('No embeddings written')
+    else:
+        for basis in write2Dobsm: #save embeddings in obs
+            adata.obs[basis+'_x']=adata.obsm[basis][:,0]
+            adata.obs[basis+'_y']=adata.obsm[basis][:,1]
     adata.obs.to_csv(prefix+"barcodes.tsv", sep = "\t", columns=[],header= False)
     adata.obs.to_csv(prefix+"metadata.tsv", sep = "\t", index= True)
+    for basis in write2Dobsm: #delete obsm->obs
+        del adata.obs[basis+'_x']
+        del adata.obs[basis+'_y']
     file2gz(prefix+"matrix.mtx")
     file2gz(prefix+"barcodes.tsv")
     ##file2gz(prefix+"metadata.tsv")
