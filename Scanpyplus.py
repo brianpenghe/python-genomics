@@ -40,6 +40,22 @@ def UpdateUnsColor(adata,ColorDict,obsKey='louvain'):
     adata.uns[obsKey+'_colors']=list(ColorUns.values())
     return adata
 
+def iRODS_stats_starsolo(samples):
+    #samples should be a list of library IDs
+    qc = pd.DataFrame(0, index=samples, columns=['n_cells', 'median_n_counts'])
+    for sample in samples:
+        #download and import data
+        os.system('iget -Kr /archive/HCA/10X/'+sample+'/starsolo/counts/Gene/cr3')
+        adata = sc.read_10x_mtx('cr3')
+        #this gets .obs['n_counts'] computed
+        sc.pp.filter_cells(adata, min_counts=1)
+        #compute the qc metrics and store them
+        qc.loc[sample, 'n_cells'] = adata.shape[0]
+        qc.loc[sample, 'median_n_counts'] = np.median(adata.obs['n_counts']).astype(float)
+        #delete downloaded count matrix
+        os.system('rm -r cr3')
+    return qc
+
 def MakeWhite(adata,obsKey='louvain',whiteCat='nan',type=str):
     temp=ExtractColor(adata,obsKey,type)
     temp[whiteCat]='#FFFFFF'
