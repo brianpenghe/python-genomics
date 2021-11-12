@@ -40,6 +40,19 @@ def UpdateUnsColor(adata,ColorDict,obsKey='louvain'):
     adata.uns[obsKey+'_colors']=list(ColorUns.values())
     return adata
 
+def ScanpySankey(adata,var1,var2,aspect=20,
+                fontsize=12, figureName="cell type", leftLabels=['Default'],
+    rightLabels=['Default']):
+    from pysankey import sankey
+    colordict={**ExtractColor(adata,var1,str),
+               **ExtractColor(adata,var2,str)}
+    if 'Default' in leftLabels:
+        leftLabels=sorted(adata.obs[var1].unique().tolist())
+    if 'Default' in rightLabels:
+        rightLabels=sorted(adata.obs[var2].unique().tolist())
+    return sankey(adata.obs[var1],adata.obs[var2],aspect=aspect,colorDict=colordict,
+fontsize=fontsize,figureName=figureName,leftLabels=leftLabels,rightLabels=rightLabels)
+
 def iRODS_stats_starsolo(samples):
     #samples should be a list of library IDs
     qc = pd.DataFrame(0, index=samples, columns=['n_cells', 'median_n_counts'])
