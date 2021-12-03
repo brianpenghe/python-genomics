@@ -69,6 +69,11 @@ def iRODS_stats_starsolo(samples):
         os.system('rm -r cr3')
     return qc
 
+def orderGroups(adata,groupby='leiden'):
+    #this returns a list of group names
+    sc.tl.dendrogram(adata,groupby=groupby)
+    return adata.uns[f'dendrogram_'+groupby]['dendrogram_info']['ivl']
+
 def MakeWhite(adata,obsKey='louvain',whiteCat='nan',type=str):
     temp=ExtractColor(adata,obsKey,type)
     temp[whiteCat]='#FFFFFF'
