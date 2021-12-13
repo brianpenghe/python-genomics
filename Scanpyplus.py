@@ -745,7 +745,7 @@ def LogisticPrediction(adata,model_pkl,genelistcsv):
 
     return adata
 
-def DouCLing(adata,hi_type,lo_type,rm_genes=[],print_marker_genes=False):
+def DouCLing(adata,hi_type,lo_type,rm_genes=[],print_marker_genes=False, fraction_threshold=0.6):
     DoubletScores=pd.DataFrame(0,index=adata.obs[hi_type].unique(),
                           columns=['Parent1','Parent2','Parent1_count','Parent2_count','All_count','p_value'])
     #Dou(blet)C(luster)L(abe)ling method
@@ -789,6 +789,6 @@ def DouCLing(adata,hi_type,lo_type,rm_genes=[],print_marker_genes=False):
                         beta.sum()-beta.loc[DoubletScores.loc[i,'Parent1']])
             DoubletScores.loc[i,'p_value']=hpd.pmf(DoubletScores.loc[i,'Parent2_count'])
     print("--- %s seconds ---" % (time.time() - start_time))
-    DoubletScores.loc[:,'Is_doublet_cluster']=(DoubletScores.loc[:,'Parent2_count'] / DoubletScores.loc[:,'All_count'] > 0.6) & \
+    DoubletScores.loc[:,'Is_doublet_cluster']=(DoubletScores.loc[:,'Parent2_count'] / DoubletScores.loc[:,'All_count'] > fraction_threshold) & \
 ~(DoubletScores.loc[:,'Parent1'] == DoubletScores.loc[:,'Parent2'])
     return DoubletScores
