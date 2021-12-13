@@ -746,7 +746,7 @@ def LogisticPrediction(adata,model_pkl,genelistcsv):
     return adata
 
 def DouCLing(adata,hi_type,lo_type,rm_genes=[],print_marker_genes=False):
-    DoubletScores=pd.DataFrame(0,index=adata.obs['new_celltype'].unique(),
+    DoubletScores=pd.DataFrame(0,index=adata.obs[hi_type].unique(),
                           columns=['Parent1','Parent2','Parent1_count','Parent2_count','All_count','p_value'])
     #Dou(blet)C(luster)L(abe)ling method
     #hi_type='leiden_R' is the key for high-resolution cell types that main include doublet clusters
