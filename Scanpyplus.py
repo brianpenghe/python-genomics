@@ -773,7 +773,7 @@ def DouCLing(adata,hi_type,lo_type,rm_genes=[],print_marker_genes=False):
             sc.tl.score_genes(adata,gene_list=scoring_genes,score_name=i+'_score')
             DoubletScores.loc[i,'Parent1']=adata[adata.obs[hi_type]==i\
                         ].obs[lo_type].value_counts().index[0]
-            cutoff=adata[adata.obs.new_celltype==i].obs[i+'_score'].quantile(q=0.75)
+            cutoff=adata[adata.obs[hi_type]==i].obs[i+'_score'].quantile(q=0.75)
 
             beta=adata.obs.loc[adata.obs.loc[:,i+'_score'\
                     ]>cutoff,lo_type].value_counts()
