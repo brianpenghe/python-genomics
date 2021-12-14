@@ -100,3 +100,13 @@ Sometimes `PseudoBulk` profiles are also useful to generate, whether it's the me
 
 The saved model files and also be re-used to predict a new query object in future by `LogisticPrediction`.
 
+## Functions in pandasPlus:
+`DF2Ann` converts a dataframe into an anndata object.
+
+`UpSetFromLists` plots an upset plot (barplot of Venn diagram intersections) based on lists of lists.
+
+`show_graph_with_labels` plots an interaction graph using edges to represent connection strength (max at 1, at least 0.9 to be shown).
+
+Dataframe values can also be used to calculate `zscore` and `Ginni` coefficients.
+
+`cellphonedb_n_interaction_Mat` and `cellphonedb_mat_per_interaction` are useful to reformat cellphonedb outputs.
