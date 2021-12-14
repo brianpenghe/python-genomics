@@ -28,3 +28,75 @@ Heterotypic doublets are usually identified by matching individual cells to synt
 To leverage the input from biologists' manual parsing and the increased sensitivity of cluster-average signatures, I introduce here an alternative approach to facilitate heterotypic doublet cluster identification. This approach scans through individual tiny clusters and look for its "Parent 2" that gives it a unique feature that's different from its sibling subclusters sharing the same "Parent 1". 
 [A notebook using published PBMC data](https://nbviewer.jupyter.org/github/brianpenghe/python-genomics/blob/master/DOUblet_Cluster_Labeling.ipynb) is provided.
 
+## Other functions in Scanpyplus:
+
+### An alternative way to call doublet subclusters based on Scrublet and [the gastrulation paper](https://www.nature.com/articles/s41586-019-0933-9)
+`Bertie(adata,Resln=1,batch_key='batch')` was written with the help from [K. Polanski](https://github.com/ktpolanski). This script aggregates Scrublet scores from subclusters and make threshold cuts based on subcluster p-values. And this is done batch by batch.
+
+A variant version `Bertie_preclustered` allows users to use user-defined clusters to calculate p-values. This is also done batch by batch.
+
+### Manipulating colors:
+You can extract the color dict of a variable from an anndata object using `ExtractColor(adata,obsKey='louvain',keytype=int)`, 
+
+and manipulate the color dict using `UpdateUnsColor`. 
+
+You can also cherry pick a value of a variable and make it white using `MakeWhite`.
+
+### Manipulating obs (observation) names and metadata:
+You can plot sankey graph between two variables of an anndata object using `ScanpySankey`. 
+
+Re-ordering the cluster IDs based on relationship rather than size can be done by `orderGroups`.
+
+`remove_barcode_suffix` removes the suffix after the '-' in the cell (barcode) name.
+
+`CopyMeta` copies the metadata (both obs and var) from one object to another.
+
+`AddMeta` stores a dataframe of obs values into an object.
+
+### Manipulating var (variable) names metadata:
+`OrthoTranslate` translates mouse genes to human orthologs and filter out poorly conserved genes, based on ortholog table that can be derived from Biomart etc.
+
+### Converting file types:
+`file2gz` creates .gz files which is useful for creating artificial 10X files.
+
+`Scanpy2MM` saves an anndata into MatrixMarket form.
+
+`mtx2df` reads MatrixMarket files into a dataframe.
+
+### Manipulating matrix:
+Transfer the raw layer to the default layer by `GetRaw` and calculate integer raw counts based on `n_counts` 
+
+and log-transformed counts using `Calculate Raw`.
+
+For large matrices, cells can be `DownSample`d based on labels such as cell types.
+
+Sometimes `PseudoBulk` profiles are also useful to generate, whether it's the mean, median or max.
+
+### Manipulating obsm embedding coordinates:
+`ShiftEmbedding` creates a platter that juxtaposes subsets of the data (batches, stages etc.) to visualize side by side.
+
+`CopyEmbedding` copies the embedding of one object to another.
+
+### Plotting stacked barplots of cell-type/condition proportions:
+`celltype_per_stage_plot` and `stage_per_celltype_plot` plot horizontal and vertical bar plots respectively based on two metadata variables (cell type and stage, for example).
+
+### Calculating differential / feature genes:
+`DEmarkers` calculates, filteres and plots differentially expressed genes between two populations.
+
+`GlobalMarkers` calculates marker genes for every cell cluster and filters them.
+
+### Plotting Seaborn plots:
+`snsSplitViolin` plots splitviolin plots for two populations.
+
+`snsCluster` plots clustermaps using an anndata object as input. This has been helped by Bao Zhang from [Zhang lab](https://github.com/ZhangHongbo-Lab)
+
+`markSeaborn` marks specific genes on a Seaborn plot.
+
+### Plotting Venn diagram:
+`Venn_Upset` can be used to directly plot upset plots (bar plots of each category of intersections).
+
+### Label transfer:
+`LogisticRegressionCellType` can learn the defining features of a variable (such as cell type) of the reference object and predict the corresponding labels of a query object. 
+
+The saved model files and also be re-used to predict a new query object in future by `LogisticPrediction`.
+
