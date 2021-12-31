@@ -29,7 +29,7 @@ There are 4 types of doublets:
 Cross-sample doublets can usually be identified by hastags or genetic backgrounds. Theoretically, (n-1)/n of intersample doublets can be identified when n samples with different hashtags/genetics are pooled equally.
 
 Heterotypic doublets can sometimes trick data scientists into thinking they are a new type of dual-feature cell type like NKT cells etc. 
-Heterotypic doublets are usually identified by matching individual cells to synthetic doublets regardless of manually curated clusters. Algorithms like Scrublet can remove a substantial part of doublet cells but not all of them. The survivor doublets can still aggregate into tiny clusters picked up by the annotaters when doing subclustering.
+Heterotypic doublets are usually identified by matching individual cells to synthetic doublets regardless of manually curated clusters. Algorithms like Scrublet can remove a substantial part of doublet cells but not all of them. The survivor doublets can still aggregate into tiny clusters picked up by the annotaters when doing subclustering. Doublets of rarer cell types are also often missed, which obscures the discoveries of new cell types and states.
 To leverage the input from biologists' manual parsing and the increased sensitivity of cluster-average signatures, I introduce here an alternative approach to facilitate heterotypic doublet cluster identification. This approach scans through individual tiny clusters and look for its "Parent 2" that gives it a unique feature that's different from its sibling subclusters sharing the same "Parent 1". 
 [A notebook using published PBMC data](https://nbviewer.jupyter.org/github/brianpenghe/python-genomics/blob/master/DOUblet_Cluster_Labeling.ipynb) is provided.
 
