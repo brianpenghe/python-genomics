@@ -40,6 +40,19 @@ def UpdateUnsColor(adata,ColorDict,obsKey='louvain'):
     adata.uns[obsKey+'_colors']=list(ColorUns.values())
     return adata
 
+def Plot3DimUMAP(adata,obsKey='leiden',obsmKey='X_umap'):
+    #Make sure adata.obsm['X_umap'] contains three columns
+    #The obsKey must points to a str/categorical variable
+    import plotly.express as px
+    ThreeDdata=pd.DataFrame(adata.obsm[obsmKey],index=adata.obs_names,columns=['x','y','z'])
+    ThreeDdata[obsKey]=adata.obs[obsKey]
+    fig=px.scatter_3d(ThreeDdata,x='x',y='y',z='z',color=obsKey,opacity=0.5,
+                 color_discrete_map=ExtractColor(adata,obsKey,str))
+    fig.update_traces(marker=dict(size=2, 
+                              line=dict(width=0,
+                                        color='black')))
+    return fig
+
 def ScanpySankey(adata,var1,var2,aspect=20,
                 fontsize=12, figureName="cell type", leftLabels=['Default'],
     rightLabels=['Default']):
