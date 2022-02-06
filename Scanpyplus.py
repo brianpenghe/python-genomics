@@ -314,7 +314,7 @@ use_raw=False,length=100,obslist=['percent_mito','n_counts','batch'],\
 min_fold_change=2,min_in_group_fraction=0.25,log=True,method='wilcoxon',
 embedding='X_umap'):
     celltype=celltype
-    sc.tl.rank_genes_groups(adata, obs, groups=[celltype],
+    sc.tl.rank_genes_groups(adata, obs, groups=[celltype],n_genes=length,
                         reference=reference,method=method,log=log,pts=True)
     temp=returnDEres(adata,key='rank_genes_groups',column=celltype)
 #    sc.tl.filter_rank_genes_groups(adata, groupby=obs,\
