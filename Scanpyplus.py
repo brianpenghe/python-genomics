@@ -100,11 +100,19 @@ obsm=adata_all.obsm,uns=adata_all.uns,obsp=adata_all.obsp)
     return adata
 
 def CalculateRaw(adata,scaling_factor=10000):
+    #update by Polanski in Feb 2022
     #The object must contain a log-transformed matrix
     #This function returns an integer-count object
     #The normalization constant is assumed to be 10000
-    return anndata.AnnData(X=sparse.csr_matrix(np.rint(np.array(np.expm1(adata.X).todense().transpose())*(adata.obs['n_counts'].values).transpose() / scaling_factor).transpose()),\
-                  obs=adata.obs,var=adata.var,obsm=adata.obsm,varm=adata.varm)
+    #return anndata.AnnData(X=sparse.csr_matrix(np.rint(np.array(np.expm1(adata.X).todense().transpose())*(adata.obs['n_counts'].values).transpose() / scaling_factor).transpose()),\
+    #              obs=adata.obs,var=adata.var,obsm=adata.obsm,varm=adata.varm)
+    X = np.expm1(adata.X)
+    scaling_vector = adata.obs['n_counts'].values / scaling_factor
+    #.indptr[i]:.indptr[i+1] provides the .data coordinates where the i'th row of the data resides in CSR
+    #which happens to be a cell, which happens to be what we have a unique entry in scaling_vector for
+    for i in np.arange(X.shape[0]):
+        X.data[X.indptr[i]:X.indptr[i+1]] = X.data[X.indptr[i]:X.indptr[i+1]] * scaling_vector[i]
+    return anndata.AnnData(X=np.rint(X),obs=adata.obs,var=adata.var,obsm=adata.obsm,varm=adata.varm)
 
 def OrthoTranslate(adata,\
 oTable='~/refseq/Mouse-Human_orthologs_only.csv'):
