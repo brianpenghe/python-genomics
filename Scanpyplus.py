@@ -406,6 +406,7 @@ def Bertie(adata,Resln=1,batch_key='batch'):
         return new_pvalues
 
     for i in np.unique(adata.obs[batch_key]):
+        print(i)
         adata_sample = adata[adata.obs[batch_key]==i,:]
         scrub = scr.Scrublet(adata_sample.X)
         doublet_scores, predicted_doublets = scrub.scrub_doublets(verbose=False)
