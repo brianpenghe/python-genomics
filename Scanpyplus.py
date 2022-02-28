@@ -626,6 +626,50 @@ def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=f
         del temp2
     return MousePseudoBulk
 
+def Dotplot2D(adata,obs1,obs2,gene,cmap='OrRd'):
+    #This function was modified from K Polanski's codes. It can plot a gene such as XIST across samples and cell types
+    #require at least these many cells in a batch+celltype intersection to process it
+    min_count = 10
+
+    #extract a simpler form of all the needed data - the gene's expression and the two obs columns
+    #this way things run way quicker downstream
+    expression = np.array(adata[:,gene].X)
+    batches = adata.obs[obs1].values
+    celltypes = adata.obs[obs2].values
+
+    dot_size_df = pd.DataFrame(0.0, index=np.unique(batches), columns=np.unique(celltypes))
+    dot_color_df = pd.DataFrame(0.0, index=np.unique(batches), columns=np.unique(celltypes))
+
+    for batch in np.unique(batches):
+        mask_batch = (batches == batch)
+        for celltype in np.unique(celltypes):
+            mask_celltype = (celltypes == celltype)
+            #skip if there's not enough data for spot
+            if np.sum(mask_batch & mask_celltype) >= min_count:
+                sub = expression[mask_batch & mask_celltype]
+                #color is mean expression
+                dot_color_df.loc[batch, celltype] = np.mean(sub)
+                #fraction expressed can be easily computed
+                #by making all expressed cells be 1, and then doing a mean again
+                sub[sub>0] = 1
+                dot_size_df.loc[batch, celltype] = np.mean(sub)
+
+    #reduce dimensions - no need for all-zero rows/cols
+    dot_size_df = dot_size_df.loc[(dot_size_df.sum(axis=1) != 0), (dot_size_df.sum(axis=0) != 0)]
+    dot_color_df = dot_color_df.loc[(dot_color_df.sum(axis=1) != 0), (dot_color_df.sum(axis=0) != 0)]
+
+    import anndata
+    from scanpy.pl import DotPlot
+
+    bdata = anndata.AnnData(np.zeros(dot_size_df.shape))
+    bdata.var_names = dot_size_df.columns
+    bdata.obs_names = list(dot_size_df.index)
+    bdata.obs[obs1] = dot_size_df.index
+    bdp = DotPlot(bdata, dot_size_df.columns, obs1, dot_size_df=dot_size_df, dot_color_df=dot_color_df)
+    bdp = bdp.style(cmap=cmap)
+    bdp.make_figure()
+
+
 def DeepTree(adata,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_variable',\
             cellnames=['default'],genenames=['default'],figsize=(10,7),row_cluster=True,col_cluster=True,\
             method='complete',metric='correlation',Cutoff=0.8,CladeSize=2):
