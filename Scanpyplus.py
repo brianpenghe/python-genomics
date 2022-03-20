@@ -318,7 +318,7 @@ def returnDEres(adata, column = None, key= None, remove_mito_ribo = True):
     return(df_final)
 
 def DEmarkers(adata,celltype,reference,obs,max_out_group_fraction=0.25,\
-use_raw=False,length=100,obslist=['percent_mito','n_counts','batch'],\
+use_raw=False,length=100,obslist=['percent_mito','n_genes','batch'],\
 min_fold_change=2,min_in_group_fraction=0.25,log=True,method='wilcoxon',
 embedding='X_umap'):
     celltype=celltype
