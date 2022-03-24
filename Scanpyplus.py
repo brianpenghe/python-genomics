@@ -46,7 +46,7 @@ def Plot3DimUMAP(adata,obsKey='leiden',obsmKey='X_umap'):
     import plotly.express as px
     ThreeDdata=pd.DataFrame(adata.obsm[obsmKey],index=adata.obs_names,columns=['x','y','z'])
     ThreeDdata[obsKey]=adata.obs[obsKey]
-    fig=px.scatter_3d(ThreeDdata,x='x',y='y',z='z',color=obsKey,opacity=0.5,
+    fig=px.scatter_3d(ThreeDdata,x='x',y='y',z='z',color=obsKey,opacity=1,
                  color_discrete_map=ExtractColor(adata,obsKey,str))
     fig.update_traces(marker=dict(size=2, 
                               line=dict(width=0,
