@@ -242,7 +242,7 @@ def stage_per_celltype_plot(adata,celltypekey='louvain',stagekey='batch',plotlab
     # this is a function for vertical bar plots
     # please remember to run pl.umap to assign colors
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str,
-    fontsize='x-small',xfontsize='x-small',legend_pos=(1,0.5),savefig=None):
+    fontsize='x-small',xfontsize='x-small',legend_pos=(1,1),savefig=None):
     if 'default' in celltypelist:
         celltypelist = sorted(adata.obs[celltypekey].unique().tolist(),key=celltypekeytype)
     if 'default' in stagelist:
