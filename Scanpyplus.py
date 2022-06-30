@@ -588,6 +588,11 @@ def snsCluster(MouseC1data,MouseC1ColorDict2={False:'#000000',True:'#00FFFF'},ce
 
     return cg1_0point2
 
+def extractSeabornRows(snsObj):
+    #This function returns a Series containing row labels
+    NewIndex=pd.DataFrame(np.asarray([snsObj.data.index[i] for i in snsObj.dendrogram_row.reordered_ind])).iloc[:,0]
+    return NewIndex
+
 def markSeaborn(snsObj,genes,clustermap=True):
     if clustermap == True:
         NewIndex=pd.DataFrame(np.asarray([snsObj.data.index[i] for i in snsObj.dendrogram_row.reordered_ind])).iloc[:,0]
