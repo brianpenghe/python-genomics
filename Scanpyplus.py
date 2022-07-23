@@ -215,6 +215,13 @@ def AddMeta(adata,meta_df):
         temp.obs[i]=meta_df.loc[temp.obs_names,i]
     return temp
 
+def AddMetaBatch(adata,meta_compact,batch_key='batch'):
+    #import your csv file into a df. The index should be batch IDs
+    temp=adata.copy()
+    for i in meta_compact.columns:
+        temp.obs[i]=temp.obs[batch_key].replace(to_replace=meta_compact.loc[:,i].to_dict())
+    return temp
+
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str,
     fontsize='x-small',yfontsize='x-small',legend_pos=(1,0.5),savefig=None):
