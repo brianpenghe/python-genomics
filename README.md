@@ -71,7 +71,7 @@ Re-ordering the cluster IDs based on relationship rather than size can be done b
 ### Manipulating matrix:
 Transfer the raw layer to the default layer by `GetRaw` and calculate integer raw counts based on `n_counts` 
 
-and log-transformed counts using `Calculate Raw`.
+and log-transformed counts using `CalculateRaw`.
 
 For large matrices, cells can be `DownSample`d based on labels such as cell types.
 
