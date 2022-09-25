@@ -114,6 +114,12 @@ def CalculateRaw(adata,scaling_factor=10000):
         X.data[X.indptr[i]:X.indptr[i+1]] = X.data[X.indptr[i]:X.indptr[i+1]] * scaling_vector[i]
     return anndata.AnnData(X=np.rint(X),obs=adata.obs,var=adata.var,obsm=adata.obsm,varm=adata.varm)
 
+def CheckGAPDH(adata,sparse=True,gene='GAPDH'):
+    if sparse==True:
+        return adata[:,gene].X[0:5].todense()
+    else:
+        return adata[:,gene].X[0:5]
+
 def OrthoTranslate(adata,\
 oTable='~/refseq/Mouse-Human_orthologs_only.csv'):
     adata.var_names_make_unique(join='-')
