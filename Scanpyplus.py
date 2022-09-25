@@ -155,9 +155,12 @@ def Scanpy2MM(adata,prefix='temp',write2Dobsm=['No']):
             adata.obs[basis+'_y']=adata.obsm[basis][:,1]
     adata.obs.to_csv(prefix+"barcodes.tsv", sep = "\t", columns=[],header= False)
     adata.obs.to_csv(prefix+"metadata.tsv", sep = "\t", index= True)
-    for basis in write2Dobsm: #delete obsm->obs
-        del adata.obs[basis+'_x']
-        del adata.obs[basis+'_y']
+    if 'No' in write2Dobsm:
+        print('No embeddings written')
+    else:
+        for basis in write2Dobsm: #delete obsm->obs
+            del adata.obs[basis+'_x']
+            del adata.obs[basis+'_y']
     file2gz(prefix+"matrix.mtx")
     file2gz(prefix+"barcodes.tsv")
     ##file2gz(prefix+"metadata.tsv")
@@ -221,6 +224,11 @@ def AddMetaBatch(adata,meta_compact,batch_key='batch'):
     for i in meta_compact.columns:
         temp.obs[i]=temp.obs[batch_key].replace(to_replace=meta_compact.loc[:,i].to_dict())
     return temp
+
+def ExtractMetaBatch(adata,batch_key='batch'):
+    #return a dataframe of the most frequent value for each variable per batch key
+    #This can be regarded as the reverse of AddMetaBatch except for numeric variables
+    return adata.obs.groupby(batch_key).agg(pd.Series.mode)
 
 def celltype_per_stage_plot(adata,celltypekey='louvain',stagekey='batch',plotlabel=True,\
     celltypelist=['default'],stagelist=['default'],celltypekeytype=int,stagekeytype=str,
