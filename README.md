@@ -6,6 +6,9 @@ To use any of these script collections, just run these two lines in your *python
 sys.path.append('/home/ubuntu/tools/python-genomics')
 import Scanpyplus
 ```
+## Citation:
+[He, Lim and Sun et al.](https://www.biorxiv.org/content/10.1101/2022.01.11.474933v1.abstract)
+A human fetal lung cell atlas uncovers proximal-distal gradients of differentiation and key regulators of epithelial fates
 
 ## DeepTree feature selection
 ![image](https://user-images.githubusercontent.com/4110443/146441826-a4079e4c-c9de-4d93-9ebe-3e1c07227eb1.png)
