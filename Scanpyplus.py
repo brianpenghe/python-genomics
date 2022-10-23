@@ -120,6 +120,14 @@ def CheckGAPDH(adata,sparse=True,gene='GAPDH'):
     else:
         return adata[:,gene].X[0:5]
 
+def FindSimilarGenes(adata,genename='GAPDH'):
+    #This function finds the most correlated genes for a given gene
+    temp=adata.to_df()
+    corr_temp=np.corrcoef(temp,rowvar=False)
+    corr_temp_series=pd.Series(corr_temp[:,temp.columns.get_loc(genename)],
+index=temp.columns)
+    return corr_temp_series.sort_values(ascending=False)
+
 def OrthoTranslate(adata,\
 oTable='~/refseq/Mouse-Human_orthologs_only.csv'):
     adata.var_names_make_unique(join='-')
