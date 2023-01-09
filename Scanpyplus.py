@@ -534,7 +534,7 @@ def Bertie_preclustered(adata,batch_key='batch',cluster_key='louvain'):
         #write out complete sample scores
         #scrublet_sample.to_csv('scrublet-scores/'+i+'.csv')
 
-        scrub.plot_histogram();
+        #scrub.plot_histogram();
         #plt.savefig('limb/sample_'+i+'_doulet_histogram.pdf')
         adata.obs.loc[adata.obs[batch_key]==i,'doublet_scores']=doublet_scores
         adata.obs.loc[adata.obs[batch_key]==i,'bh_pval'] = bh(pvals)
