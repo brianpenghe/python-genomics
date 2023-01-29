@@ -764,6 +764,19 @@ def Venn_Upset(adata,genelists,size_height=3):
     upset.plot()
     return upset
 
+def Treemap(adata,output="temp.pdf",branchlist=['project','batch'],values='n_counts',width=1000,height=700,title='title'):
+    import pandas as pd
+    import numpy as np
+    temp=adata.obs.groupby(by=branchlist).count()
+    import plotly.express as px
+    fig = px.treemap(temp.reset_index(),
+                 path=branchlist,
+                 values=values)
+    fig.update_layout(title=title,
+                  width=width, height=height)
+    fig.write_image(output)
+    return fig
+
 def DeepTree2(adata,method='complete',metric='correlation',cellnames=['default'],genenames=['default'],\
                Cutoff=0.8,CladeSize=2):
     if 'default' in cellnames:
