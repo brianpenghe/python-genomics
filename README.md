@@ -7,7 +7,7 @@ sys.path.append('/home/ubuntu/tools/python-genomics')
 import Scanpyplus
 ```
 ## Citation:
-[He, Lim and Sun et al.](https://www.biorxiv.org/content/10.1101/2022.01.11.474933v1.abstract)
+[He, Lim and Sun et al.](https://www.cell.com/cell/fulltext/S0092-8674(22)01415-5)
 A human fetal lung cell atlas uncovers proximal-distal gradients of differentiation and key regulators of epithelial fates
 
 ## DeepTree feature selection
