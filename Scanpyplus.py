@@ -907,7 +907,7 @@ def DouCLing(adata,hi_type,lo_type,rm_genes=[],print_marker_genes=False, fractio
 ~(DoubletScores.loc[:,'Parent1'] == DoubletScores.loc[:,'Parent2'])
     return DoubletScores
 
-def ClusterGenes(adata,num_pcs=50):
+def ClusterGenes(adata,num_pcs=50,embedding='tsne'):
     #adata is already log-transformed
     bdata = adata.copy()
     sc.pp.scale(bdata)
@@ -915,7 +915,10 @@ def ClusterGenes(adata,num_pcs=50):
     sc.tl.pca(bdata)
     sc.pl.pca_variance_ratio(bdata, log=True,n_pcs=50)
     sc.pp.neighbors(bdata,n_pcs=num_pcs)
-    sc.tl.umap(bdata)
+    if embedding=='umap':
+        sc.tl.umap(bdata)
+    if embedding=='tsne':
+        sc.tl.tsne(bdata)
     sc.tl.leiden(bdata,resolution=0.5)
     #bdata.obs['s_genes'] = [i in s_genes for i in bdata.obs_names]
     #bdata.obs['g2m_genes'] = [i in g2m_genes for i in bdata.obs_names]
