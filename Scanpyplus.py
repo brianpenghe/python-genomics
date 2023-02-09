@@ -106,6 +106,7 @@ def CalculateRaw(adata,scaling_factor=10000):
     #The normalization constant is assumed to be 10000
     #return anndata.AnnData(X=sparse.csr_matrix(np.rint(np.array(np.expm1(adata.X).todense().transpose())*(adata.obs['n_counts'].values).transpose() / scaling_factor).transpose()),\
     #              obs=adata.obs,var=adata.var,obsm=adata.obsm,varm=adata.varm)
+    adata.X=adata.X.tocsr() #this step makes sure the datamatrix is in csr not csc
     X = np.expm1(adata.X)
     scaling_vector = adata.obs['n_counts'].values / scaling_factor
     #.indptr[i]:.indptr[i+1] provides the .data coordinates where the i'th row of the data resides in CSR
