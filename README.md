@@ -39,7 +39,7 @@ To leverage the input from biologists' manual parsing and the increased sensitiv
 ## Other functions in Scanpyplus:
 
 ### An alternative way to call doublet subclusters based on *Scrublet* and [the gastrulation paper](https://www.nature.com/articles/s41586-019-0933-9)
-`Bertie(adata,Resln=1,batch_key='batch')` was written with the help from [K. Polanski](https://github.com/ktpolanski). This script aggregates *Scrublet* scores from subclusters and make threshold cuts based on subcluster p-values. And this is done batch by batch.
+`Bertie(adata,Resln=1,batch_key='batch')` was written with the help from [K. Polanski](https://github.com/ktpolanski). This script aggregates *Scrublet* scores from subclusters and makes threshold cuts based on subcluster p-values. And this is done batch by batch.
 
 A variant version `Bertie_preclustered` allows users to use user-defined clusters to calculate p-values. This is also done batch by batch.
 
