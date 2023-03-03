@@ -1,5 +1,5 @@
 # Processed data
-## [Human lung cell atlas](https://www.lungcellatlas.org/)
+## [Human lung cell atlases](https://www.lungcellatlas.org/)
 ### [Human fetal lung cell atlas](https://fetal-lung.cellgeni.sanger.ac.uk/)
 #### [*in situ* staining Images](https://fetal-lung.cellgeni.sanger.ac.uk/figures.html)
 #### [Visium spatial transcriptomics](https://fetal-lung.cellgeni.sanger.ac.uk/visium.html)
