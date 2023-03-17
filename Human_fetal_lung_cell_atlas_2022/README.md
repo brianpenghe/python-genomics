@@ -7,6 +7,9 @@
 #### [Visium spatial transcriptomics](https://fetal-lung.cellgeni.sanger.ac.uk/visium.html)
 Alternatively, you can find our scRNA-seq data on [cellxgene.cziscience](https://cellxgene.cziscience.com/collections/2d2e2acd-dade-489f-a2da-6c11aa654028)
 
+# Our marker gene table
+### [Marker genes for 144 cell states](https://github.com/brianpenghe/python-genomics/blob/master/Human_fetal_lung_cell_atlas_2022/MarkerGenes.md)
+
 # Raw data (fastq)
 ## [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/search.html?query=high-resolution+single-cell+multiomic+atlas+of+the+human+fetal+lung)
 ## [ENA](https://www.ebi.ac.uk/ena/browser/text-search?query=high-resolution%20single-cell%20multiomic%20atlas%20of%20the%20human%20fetal%20lung)
