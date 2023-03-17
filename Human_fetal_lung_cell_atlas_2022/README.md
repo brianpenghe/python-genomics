@@ -16,6 +16,6 @@ Alternatively, you can find our scRNA-seq data on [cellxgene.cziscience](https:/
 
 # Citation
 ![image](https://user-images.githubusercontent.com/4110443/210624020-e668e3e6-5df8-4afd-a8f2-748a50c7fee6.png)
-#### [link to Cell](https://www.cell.com/cell/fulltext/S0092-8674(22)01415-5)
+#### [link to the paper](https://www.cell.com/cell/fulltext/S0092-8674(22)01415-5)
 
 
