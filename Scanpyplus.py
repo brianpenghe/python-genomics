@@ -224,13 +224,14 @@ def CopyMeta(aFro,aTo,overwrite=False):
     else:
         obs_items=aFrom.obs.columns[~aFrom.obs.columns.isin(aTo.obs.columns)]
         var_items=aFrom.var.columns[~aFrom.var.columns.isin(aTo.var.columns)]
-    aTo.obs[obs_items]=''
-    aTo.var[var_items]=''
+    aTo.obs[obs_items]=np.nan
+    aTo.var[var_items]=np.nan
     aTo.obs.loc[aFrom.obs_names,obs_items]=aFrom.obs.loc[:,obs_items]
     aTo.var.loc[aFrom.var_names,var_items]=aFrom.var.loc[:,var_items]
     return aTo
 
-def AddMeta(adata,meta_df):
+def AddMeta(adata,meta):
+    meta_df=meta.loc[meta.index.isin(adata.obs_names),:]
     temp=adata.copy()
     temp=temp[meta_df.index]
     for i in meta_df.columns:
