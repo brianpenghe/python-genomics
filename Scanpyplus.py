@@ -213,7 +213,11 @@ def CopyEmbedding(aFrom,aTo,embedding='X_umap'):
     del aTo.obs['temp1']
     return aTo
 
-def CopyMeta(aFrom,aTo,overwrite=False):
+def CopyMeta(aFro,aTo,overwrite=False):
+    #This function copies the metadata of one object to another
+    aFrom=aFro[aFro.obs_names.isin(aTo.obs_names)][:,
+               aFro.var_names.isin(aTo.var_names)]
+    aFrom
     if overwrite==True:
         obs_items=aFrom.obs.columns
         var_items=aFrom.var.columns
