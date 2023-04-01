@@ -235,6 +235,7 @@ def AddMeta(adata,meta):
     meta_df=meta_df.loc[meta_df.index.drop_duplicates(keep=False),:]
     temp=adata.copy()
     for i in meta_df.columns:
+        print("copying"+i+"\n")
         temp.obs[i]=np.nan
         temp.obs.loc[meta_df.index,i]=meta_df.loc[:,i]
     return temp
