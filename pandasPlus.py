@@ -112,3 +112,16 @@ def cellphonedb_mat_per_interaction(interacting_pair,cpdb_p_loc='pvalues.txt'):
             InterMat.loc[i,j]= cpdb_p.loc[cpdb_p.loc[:,'interacting_pair'].isin([interacting_pair]),i+'|'+j].values
     InterMat.to_csv(cpdb_p_loc+'.pairs'+interacting_pair+'.csv')
     return InterMat
+
+def ListsOverlap(A,B):
+    #This function is written by ChatGPT to explore the overlapping element counts between each list in A and each list in B
+    #A and B are both lists of lists
+    counts = []
+    for a_list in A:
+        row = []
+        for b_list in B:
+            shared = len(set(a_list).intersection(b_list))
+            row.append(shared)
+        counts.append(row)
+    df = pd.DataFrame(counts, columns=["B" + str(i+1) for i in range(len(B))], index=["A" + str(i+1) for i in range(len(A))])
+    return df
