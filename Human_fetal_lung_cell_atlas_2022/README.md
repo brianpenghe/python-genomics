@@ -11,7 +11,11 @@ Alternatively, you can find our scRNA-seq data on [cellxgene.cziscience](https:/
 ### [Marker genes for 144 cell states](https://github.com/brianpenghe/python-genomics/blob/master/Human_fetal_lung_cell_atlas_2022/MarkerGenes.md)
 
 # Raw data (fastq)
-## [ArrayExpress](https://www.ebi.ac.uk/arrayexpress/search.html?query=high-resolution+single-cell+multiomic+atlas+of+the+human+fetal+lung)
+## [BioStudies/ArrayExpress](https://www.ebi.ac.uk/biostudies/arrayexpress/studies?query=high-resolution%2Bsingle-cell%2Bmultiomic%2Batlas%2Bof%2Bthe%2Bhuman%2Bfetal%2Blung)
+#### [Fetal lung scRNA-seq and scVDJ](https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-11278?accession=E-MTAB-11278)
+#### [Organoid scRNA-seq](https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-11267?accession=E-MTAB-11267)
+#### [Fetal lung Visium scRNA-seq](https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-11265?accession=E-MTAB-11265)
+#### [Fetal lung scATAC-seq](https://www.ebi.ac.uk/biostudies/arrayexpress/studies/E-MTAB-11266?accession=E-MTAB-11266)
 ## [ENA](https://www.ebi.ac.uk/ena/browser/text-search?query=high-resolution%20single-cell%20multiomic%20atlas%20of%20the%20human%20fetal%20lung)
 
 # Citation
