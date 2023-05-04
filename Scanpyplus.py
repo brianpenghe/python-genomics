@@ -115,6 +115,19 @@ def CalculateRaw(adata,scaling_factor=10000):
         X.data[X.indptr[i]:X.indptr[i+1]] = X.data[X.indptr[i]:X.indptr[i+1]] * scaling_vector[i]
     return anndata.AnnData(X=np.rint(X),obs=adata.obs,var=adata.var,obsm=adata.obsm,varm=adata.varm)
 
+
+def CalculateRawAuto(adata):
+    X = np.expm1(adata.X)
+    #.indptr[i]:.indptr[i+1] provides the .data coordinates where the i'th row of the data resides in CSR
+    #which happens to be a cell, which happens to be what we need to reverse
+    for i in np.arange(X.shape[0]):
+        #the object is cursed, locate lowest count for each cell. treat that as 1
+        #divide other counts by it. don't round for post-fact checks
+        norm_one = np.min(X.data[X.indptr[i]:X.indptr[i+1]])
+        X.data[X.indptr[i]:X.indptr[i+1]] = X.data[X.indptr[i]:X.indptr[i+1]] / norm_one
+    #originally this had X=np.rint(X) but we actually want the full value space here
+    return anndata.AnnData(X=X,obs=adata.obs,var=adata.var,obsm=adata.obsm,varm=adata.varm)
+
 def CheckGAPDH(adata,sparse=True,gene='GAPDH'):
     if sparse==True:
         return adata[:,gene].X[0:5].todense()
@@ -779,7 +792,7 @@ def Treemap(adata,output="temp",branchlist=['project','batch'],width=1000,height
     temp=temp[temp>0]
     import plotly.express as px
     fig = px.treemap(temp.reset_index(),
-                 path=branchlist)
+                 path=branchlist,values=0)
     fig.update_layout(title=title,
                   width=width, height=height)
     fig.write_image(output+'.pdf')
