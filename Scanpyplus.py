@@ -587,14 +587,7 @@ def snsCluster(MouseC1data,MouseC1ColorDict2={False:'#000000',True:'#00FFFF'},ce
     if 'default' in cellnames:
         cellnames = MouseC1data.obs_names
         if ( downsampleTo > 0 ) & (isinstance(downsampleTo, int)):
-            NewIndex3=[]
-            for i in MouseC1data.obs[cell_type].sort_values().unique():
-                NewIndex3=NewIndex3+random.sample(\
-                          population=MouseC1data[MouseC1data.obs[cell_type]==i\
-                                 ].obs_names.tolist(),
-                k=min(downsampleTo,len(MouseC1data[MouseC1data.obs[cell_type]==i\
-                                 ].obs_names.tolist())))
-            cellnames=MouseC1data[NewIndex3].obs_names
+            cellnames = DownSample(MouseC1data,cell_type,downsampleTo).obs_names
     if 'default' in genenames:
         genenames = MouseC1data.var_names
     genenames = [i for i in genenames if i in MouseC1data.var_names]
