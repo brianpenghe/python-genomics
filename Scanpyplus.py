@@ -657,29 +657,29 @@ def markSeaborn(snsObj,genes,clustermap=True):
     #snsObj.fig
     return snsObj.fig
 
-def PseudoBulk(MouseC1data,genenames=['default'],cell_type='louvain',filterout=float,metric='mean'):
-    if 'default' in genenames:
-        genenames = MouseC1data.var_names
-    Main_cell_types = MouseC1data.obs[cell_type].unique()
-    Main_cell_types = np.delete(Main_cell_types,\
-            [ i for i in range(len(Main_cell_types)) if isinstance(Main_cell_types[i], filterout) ])
-    MousePseudoBulk = pd.DataFrame(columns=Main_cell_types,index=genenames)
-    print(Main_cell_types)
-    for key in Main_cell_types:
-        temp=MouseC1data[MouseC1data.obs[cell_type]==key].to_df()
-        tempbool=temp.astype(bool)
-        temp[cell_type]=key
-        tempbool[cell_type]=key
-        if metric=='mean':
-            temp2 = temp.groupby(by=cell_type).mean()
-        elif metric=='median':
-            temp2 = temp.groupby(by=cell_type).median()
-        elif metric=='fraction':
-            temp2 = tempbool.groupby(by=cell_type).sum()/tempbool.groupby(by=cell_type).count()
-        del temp
-        MousePseudoBulk.loc[:,key]=temp2.loc[key,:].transpose()
-        del temp2
-    return MousePseudoBulk
+def PseudoBulk(adata, group_key, layer=None, gene_symbols=None):
+#This function was written by ivirshup
+#https://github.com/scverse/scanpy/issues/181#issuecomment-534867254
+    if layer is not None:
+        getX = lambda x: x.layers[layer]
+    else:
+        getX = lambda x: x.X
+    if gene_symbols is not None:
+        new_idx = adata.var[idx]
+    else:
+        new_idx = adata.var_names
+
+    grouped = adata.obs.groupby(group_key)
+    out = pd.DataFrame(
+        np.zeros((adata.shape[1], len(grouped)), dtype=np.float64),
+        columns=list(grouped.groups.keys()),
+        index=adata.var_names
+    )
+
+    for group, idx in grouped.indices.items():
+        X = getX(adata[idx])
+        out[group] = np.ravel(X.mean(axis=0, dtype=np.float64))
+    return out
 
 def Dotplot2D(adata,obs1,obs2,gene,cmap='OrRd'):
     #This function was modified from K Polanski's codes. It can plot a gene such as XIST across samples and cell types
