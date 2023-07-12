@@ -747,7 +747,7 @@ def DeepTree(adata,MouseC1ColorDict2,cell_type='louvain',gene_type='highly_varia
                            figsize=figsize,row_cluster=True,col_cluster=True,metric=metric)
     return [bdata,test,test1,test2]
 
-def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch'],min_clustersize=100):
+def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch'],min_clustersize=100,Cutoff=0.8,CladeSize=2):
     batchlist=adata.obs[batch_key].value_counts()
     for key in batchlist[batchlist>min_clustersize].index:
         print(key)
@@ -759,7 +759,7 @@ def DeepTree_per_batch(adata,batch_key='batch',obslist=['batch'],min_clustersize
                         cell_type=obslist,
                         cellnames=adata[adata.obs[batch_key]==key,:].obs_names.tolist(),
                         genenames=adata[:,adata.var['highly_variable'+key]].var_names.tolist(),
-                         row_cluster=True,col_cluster=True)
+                         row_cluster=True,col_cluster=True,Cutoff=Cutoff,CladeSize=CladeSize)
         adata.var['Deep_'+key]=pd.Series(adata.var_names,index=adata.var_names).isin((bdata)[:,bdata.var['Deep']].var_names)
 #        sc.pl.umap(adata,color=obslist)
     adata.var['Deep_n']=0
@@ -927,7 +927,7 @@ def ClusterGenes(adata,num_pcs=50,embedding='tsne'):
     bdata = adata.copy()
     sc.pp.scale(bdata)
     bdata = bdata.T
-    sc.tl.pca(bdata)
+    sc.tl.pca(bdata,n_comps=num_pcs)
     sc.pl.pca_variance_ratio(bdata, log=True,n_pcs=50)
     sc.pp.neighbors(bdata,n_pcs=num_pcs)
     if embedding=='umap':
