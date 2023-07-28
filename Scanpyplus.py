@@ -865,12 +865,8 @@ def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidat
 def LogisticPrediction(adata,model_pkl,genelistcsv):
     #This function imports saved logistic model and gene list csv to predict cell types for adata
     #adata has better been scaled if you trained a model using scaled AnnData
-    CT_genes=pd.read_csv(genelistcsv,header=None)
-    CT_genes['idx'] = CT_genes.index
-    CT_genes.columns = ['symbol', 'idx']
-    CT_genes = np.array(CT_genes['symbol'])
-
-    lr = joblib.load(open(model_pkl,'rb'))
+    CT_genes = LoadLogitGenes(genelistcsv)
+    lr = LoadLogitModel(model_pkl)
     lr.features = CT_genes
     features = adata.var_names
     k_x = features.isin(list(CT_genes))
@@ -888,8 +884,7 @@ def LogisticPrediction(adata,model_pkl,genelistcsv):
     lr.coef_ = lr.coef_[:, lr_idx]
     predicted_hi = lr.predict(X)
     adata.obs['predicted_hi'] = predicted_hi
-
-    return adata
+    return AddMeta(adata,ExtractLogitScores(adata,lr,CT_genes))
 
 def DouCLing(adata,hi_type,lo_type,rm_genes=[],print_marker_genes=False, fraction_threshold=0.6):
     DoubletScores=pd.DataFrame(0,index=adata.obs[hi_type].unique(),
