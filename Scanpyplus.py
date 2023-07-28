@@ -809,6 +809,23 @@ def DeepTree2(adata,method='complete',metric='correlation',cellnames=['default']
     bdata.var['Deep']=DeepIndex
     return bdata
 
+def LoadLogitModel(model_addr):
+    import joblib
+    lr = joblib.load(open(model_addr,'rb'))
+    return lr
+
+def LoadLogitGenes(genecsv):
+    CT_genes=pd.read_csv(genecsv,header=None)
+    CT_genes['idx'] = CT_genes.index
+    CT_genes.columns = ['symbol', 'idx']
+    CT_genes = np.array(CT_genes['symbol'])
+    return CT_genes
+
+def ExtractLogitScores(adata,model,CT_genes):
+    P=model.predict_proba(adata[:,CT_genes].X)
+    df=pd.DataFrame(P,index=adata.obs_names,columns=model.classes_+'_prob')
+    df['lr_score']=df.max(axis=1)
+    return df
 
 from datetime import date
 def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidate = False,\
