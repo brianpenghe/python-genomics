@@ -883,7 +883,7 @@ def LogisticPrediction(adata,model_pkl,genelistcsv):
     lr.features = lr.features[lr_idx]
     lr.coef_ = lr.coef_[:, lr_idx]
     predicted_hi = lr.predict(X)
-    adata.obs['predicted_hi'] = predicted_hi
+    adata.obs['Predicted'] = predicted_hi
     return AddMeta(adata,ExtractLogitScores(adata,lr,CT_genes))
 
 def DouCLing(adata,hi_type,lo_type,rm_genes=[],print_marker_genes=False, fraction_threshold=0.6):
