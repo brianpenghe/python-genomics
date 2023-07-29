@@ -675,10 +675,9 @@ def PseudoBulk(adata, group_key, layer=None, gene_symbols=None):
         out[group] = np.ravel(X.mean(axis=0, dtype=np.float64))
     return out
 
-def Dotplot2D(adata,obs1,obs2,gene,cmap='OrRd'):
+def Dotplot2D(adata,obs1,obs2,gene,cmap='OrRd', min_count=1):
     #This function was modified from K Polanski's codes. It can plot a gene such as XIST across samples and cell types
     #require at least these many cells in a batch+celltype intersection to process it
-    min_count = 10
 
     #extract a simpler form of all the needed data - the gene's expression and the two obs columns
     #this way things run way quicker downstream
