@@ -428,13 +428,18 @@ min_clustersize=100,genenames=['default']):
     return adata
 
 def HVG_cutoff(adata,range_int=10,cutoff=5000,HVG_var='highly_variable_n',fig_size=(8,6)):
+    if range_int>max(adata.var['highly_variable_n']):
+        raise Exception("range_int can't be larger than max(highly_variable_n)")
     HVG_list=[]
     for i in list(range(range_int)):
         HVG_list.append((adata.var[HVG_var]>i).value_counts()[True])
     plt.figure(figsize=fig_size)
     plt.plot(list(range(range_int)),HVG_list)
     plt.axhline(y=cutoff, color='r', linestyle='--')
-    return
+    HVG_n=next((x for x in reversed(HVG_list) if x >= cutoff), None)
+    HVG_i=len(HVG_list) - 1 - next((i for i, x in enumerate(reversed(HVG_list)) if x >= cutoff), None)
+    print("The smallest i for intersection to achieve more than "+str(cutoff)+" HVGs is "+str(HVG_i)+" , yielding "+str(HVG_n)+" genes")
+    return HVG_i
 
 def Bertie(adata,Resln=1,batch_key='batch'):
     import scrublet as scr
