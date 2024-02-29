@@ -247,11 +247,11 @@ def AddMeta(adata,meta):
     meta_df=meta.loc[meta.index.isin(adata.obs_names),:]
     meta_df=meta_df.loc[meta_df.index.drop_duplicates(keep=False),:]
     temp=adata.copy()
-    temp.obs=temp.obs.combine_first(meta_df)
-#    for i in meta_df.columns:
-#        print("copying "+i+"\n")
-#        temp.obs[i]=np.nan
-#        temp.obs.loc[meta_df.index,i]=meta_df.loc[:,i]
+#    temp.obs=temp.obs.combine_first(meta_df) #it has barcode sliding problem!
+    for i in meta_df.columns:
+        print("copying "+i+"\n")
+        temp.obs[i]=np.nan
+        temp.obs.loc[meta_df.index,i]=meta_df.loc[:,i]
     return temp
 
 def AddMetaBatch(adata,meta_compact,batch_key='batch'):
