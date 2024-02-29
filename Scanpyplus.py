@@ -247,7 +247,7 @@ def AddMeta(adata,meta):
     meta_df=meta.loc[meta.index.isin(adata.obs_names),:]
     meta_df=meta_df.loc[meta_df.index.drop_duplicates(keep=False),:]
     temp=adata.copy()
-    temp.obs=temp.obs.combine_first(meta)
+    temp.obs=temp.obs.combine_first(meta_df)
 #    for i in meta_df.columns:
 #        print("copying "+i+"\n")
 #        temp.obs[i]=np.nan
