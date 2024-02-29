@@ -427,6 +427,15 @@ min_clustersize=100,genenames=['default']):
     adata.var['highly_variable_n']=temp
     return adata
 
+def HVG_cutoff(adata,range_int=10,cutoff=5000,HVG_var='highly_variable_n',fig_size=(8,6)):
+    HVG_list=[]
+    for i in list(range(range_int)):
+        HVG_list.append((adata.var[HVG_var]>i).value_counts()[True])
+    plt.figure(figsize=fig_size)
+    plt.plot(list(range(range_int)),HVG_list)
+    plt.axhline(y=cutoff, color='r', linestyle='--')
+    return
+
 def Bertie(adata,Resln=1,batch_key='batch'):
     import scrublet as scr
     scorenames = ['scrublet_score','scrublet_cluster_score','bh_pval']
