@@ -428,8 +428,8 @@ min_clustersize=100,genenames=['default']):
     return adata
 
 def HVG_cutoff(adata,range_int=10,cutoff=5000,HVG_var='highly_variable_n',fig_size=(8,6)):
-    if range_int>max(adata.var['highly_variable_n']):
-        raise Exception("range_int can't be larger than max(highly_variable_n)")
+    if range_int>max(adata.var[HVG_var]):
+        range_int=max(adata.var[HVG_var])
     HVG_list=[]
     for i in list(range(range_int)):
         HVG_list.append((adata.var[HVG_var]>i).value_counts()[True])
