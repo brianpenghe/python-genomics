@@ -436,8 +436,8 @@ def HVG_cutoff(adata,range_int=10,cutoff=5000,HVG_var='highly_variable_n',fig_si
     plt.figure(figsize=fig_size)
     plt.plot(list(range(range_int)),HVG_list)
     plt.axhline(y=cutoff, color='r', linestyle='--')
-    HVG_n=next((x for x in reversed(HVG_list) if x >= cutoff), None)
-    HVG_i=len(HVG_list) - 1 - next((i for i, x in enumerate(reversed(HVG_list)) if x >= cutoff), None)
+    HVG_n=next((x for x in reversed(HVG_list) if x >= cutoff), HVG_list[0])
+    HVG_i=len(HVG_list) - 1 - next((i for i, x in enumerate(reversed(HVG_list)) if x >= cutoff), len(HVG_list)-1)
     print("The smallest i for intersection to achieve more than "+str(cutoff)+" HVGs is "+str(HVG_i)+" , yielding "+str(HVG_n)+" genes")
     return HVG_i
 
