@@ -394,6 +394,8 @@ embedding='X_umap'):
              groupby=obs,use_raw=use_raw,standard_scale='var')
     sc.pl.stacked_violin(adata[adata.obs[obs].isin([celltype,reference]),:],var_names=GeneList,groupby=obs,
            swap_axes=True)
+    del adata.uns['rank_genes_groups']
+    del adata.uns['rank_genes_groups_filtered']
     return GeneList
 
 def GlobalMarkers(adata,obs,max_out_group_fraction=0.25,min_fold_change=2,\
