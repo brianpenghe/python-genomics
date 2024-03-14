@@ -375,19 +375,19 @@ embedding='X_umap'):
     celltype=celltype
     sc.tl.rank_genes_groups(adata, obs, groups=[celltype],n_genes=length,
                         reference=reference,method=method,log=log,pts=True)
-    temp=returnDEres(adata,key='rank_genes_groups',column=celltype)
-#    sc.tl.filter_rank_genes_groups(adata, groupby=obs,\
-#                    max_out_group_fraction=max_out_group_fraction,
-#                    min_fold_change=min_fold_change,use_raw=use_raw,
-#                    min_in_group_fraction=min_in_group_fraction,log=log)
-#    GeneList=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names']).loc[:,celltype].dropna().head(length).transpose().tolist()
-    temp1=pd.concat([temp,
-        (adata[:,temp.index][adata.obs[obs]==celltype].to_df()>0).mean(axis=0).rename('pct1'),
-        (adata[:,temp.index][adata.obs[obs]==reference].to_df()>0).mean(axis=0).rename('pct2')],
-        axis=1)
+#    temp=returnDEres(adata,key='rank_genes_groups',column=celltype)
+    sc.tl.filter_rank_genes_groups(adata, groupby=obs,\
+                    max_out_group_fraction=max_out_group_fraction,
+                    min_fold_change=min_fold_change,use_raw=use_raw,
+                    min_in_group_fraction=min_in_group_fraction)
+    GeneList=pd.DataFrame(adata.uns['rank_genes_groups_filtered']['names']).loc[:,celltype].dropna().head(length).transpose().tolist()
+#    temp1=pd.concat([temp,
+#        (adata[:,temp.index][adata.obs[obs]==celltype].to_df()>0).mean(axis=0).rename('pct1'),
+#        (adata[:,temp.index][adata.obs[obs]==reference].to_df()>0).mean(axis=0).rename('pct2')],
+#        axis=1)
     import math
-    GeneList=temp1.loc[(temp1.pvals < 0.05) & (temp1.pct1 >= min_in_group_fraction) & \
-(temp1.logfoldchanges > math.log(min_fold_change)) & (temp1.pct2 <= max_out_group_fraction),:].index.tolist()
+#    GeneList=temp1.loc[(temp1.pvals < 0.05) & (temp1.pct1 >= min_in_group_fraction) & \
+#(temp1.logfoldchanges > math.log(min_fold_change)) & (temp1.pct2 <= max_out_group_fraction),:].index.tolist()
     sc.pl.embedding(adata,basis=embedding,color=GeneList+obslist,
            color_map = 'jet',use_raw=use_raw)
     sc.pl.dotplot(adata,var_names=GeneList,
