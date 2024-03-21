@@ -5,6 +5,8 @@
 #### [scRNA-seq](https://fetal-lung.cellgeni.sanger.ac.uk/scRNA.html)
 #### [scATAC-seq](https://fetal-lung.cellgeni.sanger.ac.uk/atac) 
     [cellranger-atac output files](https://urldefense.proofpoint.com/v2/url?u=https-3A__drive.google.com_drive_folders_1AOfYN7fl31XzxVqDjMA0OAE9PpVMtOa4-3Fusp-3Dsharing&d=DwMFaQ&c=D7ByGjS34AllFgecYw0iC6Zq7qlm8uclZFI0SqQnqBo&r=jnOclbqDO8gTjG2ALkLiP8QIqLRquEVwWdtJRbxgXwQ&m=CrCPk7IFAhbpTuzwLiJOGATAuwNr00RsDhlXZQYUwp0PZkwrkNp6IzSs3bGi_-WT&s=GQoOWAXqOaG0J66pOVnkjM0-TOuGj3Hr5bR6OLbRwkc&e=)
+    
+&nbsp;&nbsp;&nbsp;&nbsp;[ATAC-seq tracks](https://genome.ucsc.edu/s/brianpenghe/scATAC_fetal_lung20211206)
 #### [*in situ* staining Images](https://fetal-lung.cellgeni.sanger.ac.uk/figures.html)
 #### [Visium spatial transcriptomics](https://fetal-lung.cellgeni.sanger.ac.uk/visium.html)
 Alternatively, you can find our scRNA-seq data on [cellxgene.cziscience](https://cellxgene.cziscience.com/collections/2d2e2acd-dade-489f-a2da-6c11aa654028)
