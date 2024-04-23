@@ -36,7 +36,8 @@ Heterotypic doublets are usually identified by matching individual cells to synt
 To leverage the input from biologists' manual parsing and the increased sensitivity of cluster-average signatures, I introduce here an alternative approach to facilitate heterotypic doublet cluster identification. This approach scans through individual tiny clusters and look for its "Parent 2" that gives it a unique feature that's different from its sibling subclusters sharing the same "Parent 1". 
 [A notebook using published PBMC data](https://nbviewer.jupyter.org/github/brianpenghe/python-genomics/blob/master/DOUblet_Cluster_Labeling.ipynb) is provided.
 
-## Other functions in Scanpyplus:
+<details>
+  <summary><b>Other functions in Scanpyplus:</b></summary>
 
 ### An alternative way to call doublet subclusters based on *Scrublet* and [the gastrulation paper](https://www.nature.com/articles/s41586-019-0933-9)
 `Bertie(adata,Resln=1,batch_key='batch')` was written with the help from [K. Polanski](https://github.com/ktpolanski). This script aggregates *Scrublet* scores from subclusters and makes threshold cuts based on subcluster p-values. And this is done batch by batch.
@@ -119,8 +120,11 @@ Sometimes `PseudoBulk` profiles are also useful to generate, whether it's the me
 `LogisticRegressionCellType` can learn the defining features of a variable (such as cell type) of the reference object and predict the corresponding labels of a query object. 
 
 The saved model files and also be re-used to predict a new query object in future by `LogisticPrediction`.
+</details>
 
-## Functions in pandasPlus:
+<details>
+  <summary><b>Functions in pandasPlus:</b></summary>
+
 `DF2Ann` converts a dataframe into an *anndata* object.
 
 `UpSetFromLists` plots an upset plot (barplot of Venn diagram intersections) based on lists of lists.
@@ -130,3 +134,4 @@ The saved model files and also be re-used to predict a new query object in futur
 Dataframe values can also be used to calculate `zscore` and `Ginni` coefficients.
 
 `cellphonedb_n_interaction_Mat` and `cellphonedb_mat_per_interaction` are useful to reformat cellphonedb outputs.
+</details>
