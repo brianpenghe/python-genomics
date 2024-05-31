@@ -842,6 +842,11 @@ def ExtractLogitScores(adata,model,CT_genes):
     df['lr_score']=df.max(axis=1)
     return df
 
+def Model2Coeff(model_pkl,genelistcsv):
+    lr = LoadLogitModel(model_pkl)
+    CT_genes = LoadLogitGenes(genelistcsv)
+    return pd.DataFrame(lr.coef_,columns=CT_genes,index=lr.classes_)
+
 from datetime import date
 def LogisticRegressionCellType(Reference, Query, Category = 'louvain', DoValidate = False,\
     multi_class='ovr',n_jobs=15,max_iter=1000,tol=1e-4,keyword=''):
