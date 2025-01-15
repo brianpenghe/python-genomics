@@ -27,6 +27,103 @@ from scipy import cluster
 from glob import iglob
 import gzip
 
+from adjustText import adjust_text
+import matplotlib.colors
+
+def plot_umap_with_labels(
+    adata,
+    color_column,
+    output_png_path,
+    output_pdf_path,
+    figsize=(12, 10),
+    point_size=5,
+    label_fontsize=8,
+    label_weight='bold',
+    arrow_color='red',
+    dpi=300,
+    palette=None
+):
+    """
+    Plot a UMAP scatter plot with labels and save it as PNG and PDF files.
+
+    Parameters:
+        adata: AnnData object containing UMAP coordinates and grouping information.
+        color_column: str, column in adata.obs used for coloring points.
+        output_png_path: str, path to save the PNG file.
+        output_pdf_path: str, path to save the PDF file.
+        figsize: tuple, size of the figure (width, height).
+        point_size: int, size of the scatter plot points.
+        label_fontsize: int, font size of the labels.
+        label_weight: str, font weight of the labels (e.g., 'bold').
+        arrow_color: str, color of the arrows used to adjust text labels.
+        dpi: int, resolution of the saved images.
+        palette: list, optional, color palette for the scatter plot.
+
+    Returns:
+        None
+    """
+    # Create a figure and axis object
+    fig, ax = plt.subplots(figsize=figsize)
+
+    # Plot UMAP scatter plot
+    sc.pl.umap(
+        adata,
+        color=[color_column],
+        ax=ax,
+        size=point_size,
+        legend_loc=None,  # Disable default legend
+        palette=palette if palette else list(matplotlib.colors.CSS4_COLORS.values()),
+        show=False
+    )
+
+    # Add custom text labels
+    texts = []
+    for label in adata.obs[color_column].unique():
+        subset = adata.obs[adata.obs[color_column] == label]
+        idx = adata.obs.index.get_loc(subset.index[0])  # Get the integer index of the first occurrence
+        x = adata.obsm['X_umap'][idx, 0]
+        y = adata.obsm['X_umap'][idx, 1]
+        texts.append(ax.text(x, y, label, fontsize=label_fontsize, weight=label_weight))
+
+    # Adjust text to avoid overlaps
+    adjust_text(texts, arrowprops=dict(arrowstyle='->', color=arrow_color))
+
+    # Adjust figure margins
+    plt.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05)
+
+    # Save the plot
+    if output_png_path:
+        plt.savefig(output_png_path, format='png', dpi=dpi, bbox_inches='tight')
+    if output_pdf_path:
+        plt.savefig(output_pdf_path, format='pdf', dpi=dpi, bbox_inches='tight')
+
+    # Show the plot
+    plt.show()
+
+# Example usage
+# from anndata import AnnData
+# import scanpy as sc
+#
+# # Assume `adata_highQ_epi` is a preloaded AnnData object with UMAP coordinates
+# adata_highQ_epi = AnnData()  # Replace this with actual AnnData loading
+# adata_highQ_epi.obsm['X_umap'] = [[1, 2], [3, 4], [5, 6]]  # Mock UMAP coordinates
+# adata_highQ_epi.obs['lev3_celltype'] = ['Type1', 'Type2', 'Type3']  # Mock cell types
+#
+# # Call the function with detailed parameters
+# plot_umap_with_labels(
+#     adata=adata_highQ_epi,
+#     color_column='lev3_celltype',
+#     output_png_path='/path/to/Epi_umap_plot.png',
+#     output_pdf_path='/path/to/Epi_umap_plot.pdf',
+#     figsize=(10, 8),
+#     point_size=10,
+#     label_fontsize=12,
+#     label_weight='bold',
+#     arrow_color='blue',
+#     dpi=300
+# )
+
+
 def ExtractColor(adata,obsKey='louvain',keytype=int):
 #   labels=sorted(adata.obs[obsKey].unique().to_list(),key=keytype)
     labels=adata.obs[obsKey].cat.categories
